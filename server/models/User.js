@@ -25,11 +25,27 @@ const UserSchema = new mongoose.Schema(
       default: "",
     },
     qualification: {
-        type: String,
-        enum: ["Intermediate", "High School", "Graduation" , "Post Graduation" , "Post Doctoral" , "Others"],
+      type: String,
+      enum: ["Intermediate", "High School", "Graduation" , "Post Graduation" , "Post Doctoral" , "Others"],
       },
     progress : {
-      
+      type : [
+        {
+            subjectid : String,
+            courselist : [
+              {
+                courseid : String,
+                unitlist : [
+                  {
+                    unitid : String,
+                    topiclist : [String],
+                  }
+                ]
+              }
+            ],
+        }
+      ],
+      default : [],
     }
   },
   { timestamps: true }

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Unit from "./Unit";
 
 const CourseSchema = new mongoose.Schema(
   {
@@ -8,7 +7,7 @@ const CourseSchema = new mongoose.Schema(
         required : true,
     },
     unitlist : {
-        type : [Unit] ,
+        type : [mongoose.Schema.Types.Mixed],
         default : [],
     }
   },
