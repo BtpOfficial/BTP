@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+.main {
+    display: flex;
+    height: 130px;
+    font-family: "Ubuntu", sans-serif;
+}
+
+.first {
+    display: flex;
+    width: 23%;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 5%;
+}
+
+.first_inside {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3%;
+    width: 100%;
+    padding: 14px 14px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.second {
+    display: flex;
+    width: 55%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 2%;
+}
+
+.third {
+    display: flex;
+    width: 22%;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 5%;
+    gap: 10%;
+    transition: all 500ms ease-in;
+}
+
+.name {
+    font-size: 40px;
+    transition: all ease 500ms;
+}
+
+.logo {
+    height: 50px;
+    width: 70px;
+}
+
+.search {
+    border: none;
+    background-color: transparent;
+    border-bottom: 2px solid;
+}
+
+.search_text {
+    font-size: 17px;
+}
+
+.search_icon {
+    font-size: 25px;
+    color: rgb(0, 0, 0);
+}
+
+input:focus {
+    outline: none;
+}
+
+.nav_item {
+    transition: all ease 500ms;
+    font-weight: 500;
+}
+
+.nav_item:hover {
+    cursor: pointer;
+    color: #F0624F;
+}
+
+.name:hover {
+    cursor: pointer;
+    color: #F0624F;
+}
+
+.burger {
+    display: none;
+}
+
+.secondin {
+    display: flex;
+}
+
+
+@media screen and (max-width:1050px) {
+    .first_inside {
+        padding: 14px 20px;
+
+    }
+}
+
+@media screen and (max-width:976px) {
+    .first {
+        display: none;
+    }
+
+    .second {
+        width: 70%;
+        justify-content: flex-start;
+        padding-left: 2%;
+    }
+
+    .third {
+        width: 30%;
+    }
+
+    .name {
+        font-size: 37px;
+    }
+}
+
+@media screen and (max-width:600px) {
+    .secondin {
+        width: 80%;
+    }
+
+
+    .burger {
+        display: flex;
+        font-size: 40px;
+        width: 20%;
+        justify-content: flex-end;
+        padding-right: 4%;
+    }
+
+    .burger:hover {
+        cursor: pointer;
+    }
+
+    .main {
+        flex-direction: column;
+        margin-top: 30px;
+    }
+
+    .second {
+        width: 100%;
+
+    }
+
+    .third {
+        flex-direction: column;
+        height: 200px;
+        width: 100%;
+        margin-top: 30px;
+        transform: translateY(-200%);
+    }
+
+    .name {
+        font-size: 33px;
+        transition: all ease 500ms;
+    }
+
+    .logo {
+        height: 35px;
+        width: 49px;
+    }
+
+}
+
+@media screen and (max-width:386px) {
+    .name {
+        font-size: 28px;
+    }
+
+}
+
+.special {
+    transform: translateY(0);
+}
+
+.active {
+    color: #F0624F;
+}
