@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,300;0,700;1,300;1,400;1,300;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
+
+.topcont {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "Ubuntu", sans-serif;
+    padding: 5% 5%;
+}
+
+
+.right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.right_first {
+    font-family: "Roboto Slab", serif;
+    display: flex;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.right_third {
+    display: flex;
+    gap: 7%;
+}
+
+.homebutton {
+    display: flex;
+    width: 24%;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #F0624F;
+    color: white;
+    transition: all 200ms ease;
+}
+
+.homebutton:hover {
+    cursor: pointer;
+    box-shadow: 0 12px 16px 0 rgba(54, 54, 54, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.left {
+    display: flex;
+    width: 50%;
+    justify-content: center;
+    align-items: center;
+}
+
+.homeimg {
+    height: 350px;
+    width: 300px;
+}
+
+@media screen and (max-width:788px) {
+    .homeimg {
+        height: 200px;
+        width: 200px;
+    }
+
+    .topcont {
+        gap: 20px;
+    }
+
+    .right {
+        width: 47%;
+    }
+
+    .right_first {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .homebutton {
+        width: 25%;
+        padding: 8px 17px;
+        font-size: 14px;
+    }
+
+}
+
+@media screen and (max-width:600px) {
+    .left {
+        display: none;
+    }
+
+    .right {
+        width: 100%;
+    }
+}

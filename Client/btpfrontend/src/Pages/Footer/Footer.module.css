@@ -6,23 +6,6 @@
     margin: 0;
 }
 
-header {
-    text-align: center;
-    padding-top: 100px;
-    margin-bottom: 300px;
-    font-size: 35px;
-}
-
-header h2 {
-    color: #f0525f;
-}
-
-header span {
-    color: #eaa03f;
-}
-
-/* The footer is fixed to the bottom of the page */
-
 footer {
     font-family: "Ubuntu", sans-serif;
     position: fixed;
@@ -38,6 +21,7 @@ footer {
     header {
         padding-top: 40px;
     }
+
 }
 
 .footer_distributed {
@@ -47,7 +31,6 @@ footer {
     text-align: left;
     font: bold 16px sans-serif;
     padding: 50px 50px 60px 50px;
-    margin-top: 80px;
     display: flex;
     flex-direction: row;
 }
@@ -184,5 +167,9 @@ footer {
         justify-content: center;
         align-items: center;
         width: 100%;
+    }
+
+    .footer_center_in {
+        margin-top: 10px;
     }
 }
