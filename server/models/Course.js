@@ -6,9 +6,13 @@ const CourseSchema = new mongoose.Schema(
         type : String,
         required : true,
     },
-    unitlist : {
-        type : [mongoose.Schema.Types.Mixed],
+    unitList : {
+        type : [String],
         default : [],
+    },
+    quizzes : {
+        type : [String],
+        default : {}
     }
   },
   { timestamps: true }

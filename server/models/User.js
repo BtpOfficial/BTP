@@ -20,10 +20,6 @@ const UserSchema = new mongoose.Schema(
       required: true,
       min: 5, // password length should be minimun of 5 characters
     },
-    picturePath: {
-      type: String,
-      default: "",
-    },
     qualification: {
       type: String,
       enum: ["Intermediate", "High School", "Graduation" , "Post Graduation" , "Post Doctoral" , "Others"],
@@ -31,16 +27,17 @@ const UserSchema = new mongoose.Schema(
     progress : {
       type : [
         {
-            subjectid : String,
-            courselist : [
+            subjectId : String,
+            courseList : [
               {
-                courseid : String,
-                unitlist : [
+                courseId : String,
+                unitList : [
                   {
-                    unitid : String,
-                    topiclist : [String],
+                    unitId : String,
+                    topicList : [String],
                   }
-                ]
+                ],
+                quizList : [String],
               }
             ],
         }

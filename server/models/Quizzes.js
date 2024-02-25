@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
-const SubjectSchema = new mongoose.Schema(
+const QuizzesSchema = new mongoose.Schema(
   {
-    title:{
+    title : {
         type : String,
         required : true,
     },
-    courseList:{
+    quizList : {
         type : [String] ,
         default : [],
     }
@@ -14,5 +14,5 @@ const SubjectSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Subject = mongoose.model("Subject", SubjectSchema);
-export default Subject;
+const Quizzes = mongoose.model("Quizzes", QuizzesSchema);
+export default Quizzes;

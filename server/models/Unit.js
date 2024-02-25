@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Topic from "./Topic";
 
 const UnitSchema = new mongoose.Schema(
   {
@@ -7,8 +6,8 @@ const UnitSchema = new mongoose.Schema(
         type : String,
         required : true,
     },
-    topiclist : {
-        type : [Topic] ,
+    topicList : {
+        type : [String] ,
         default : [],
     }
   },
