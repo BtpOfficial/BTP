@@ -84,7 +84,8 @@ input:focus {
 
 .nav_item:hover {
     cursor: pointer;
-    color: #F0624F;
+
+
 }
 
 .name:hover {
