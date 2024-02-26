@@ -4,6 +4,7 @@ import { CiSearch } from "react-icons/ci";
 import Logo from "../../assets/logo.jpg"
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
+import { Link } from "react-router-dom";
 const Navbar = () => {
     const [hide, sethide] = useState(false);
     const [Active1, setActive1] = useState(true);
@@ -49,8 +50,8 @@ const Navbar = () => {
             </div>
             <div className={`${Styles.third}  ${hide ? Styles.special : ''}`} >
                 <p className={`${Styles.nav_item} ${Active1 && Styles.active}`} onClick={makeActiveHome}>Home</p>
-                <p className={`${Styles.nav_item} ${Active2 && Styles.active}`} onClick={makeActiveLogin}>Login  </p>
-                <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} onClick={makeActiveSignUp}>SignUp </p>
+                <p className={`${Styles.nav_item} ${Active2 && Styles.active}`} onClick={makeActiveLogin}> <Link to={"/login"}>Login</Link>  </p>
+                <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} onClick={makeActiveSignUp}><Link to={"/signup"}>SignUp</Link>  </p> 
                 {/* <p className={Styles.nav_item}>LogOut </p> */}
             </div>
         </div>
