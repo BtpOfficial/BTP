@@ -49,9 +49,9 @@ const Navbar = () => {
                 }
             </div>
             <div className={`${Styles.third}  ${hide ? Styles.special : ''}`} >
-                <p className={`${Styles.nav_item} ${Active1 && Styles.active}`} onClick={makeActiveHome}>Home</p>
+                <p className={`${Styles.nav_item} ${Active1 && Styles.active}`} onClick={makeActiveHome}> <Link to={"/"}>Home</Link> </p>
                 <p className={`${Styles.nav_item} ${Active2 && Styles.active}`} onClick={makeActiveLogin}> <Link to={"/login"}>Login</Link>  </p>
-                <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} onClick={makeActiveSignUp}><Link to={"/signup"}>SignUp</Link>  </p> 
+                <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} onClick={makeActiveSignUp}><Link to={"/signup"}>SignUp</Link>  </p>
                 {/* <p className={Styles.nav_item}>LogOut </p> */}
             </div>
         </div>
