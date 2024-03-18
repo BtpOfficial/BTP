@@ -1,6 +1,7 @@
 import React from "react";
 import Styles from "./Homepage.module.css"
 import homeimg from '../../assets/homeimg.png'
+import Items from "./Items";
 const Home = () => {
     return (<>
         <div className={Styles.topcont}>
@@ -18,6 +19,8 @@ const Home = () => {
                 </div>
             </div>
         </div>
+        <Items />
+
     </>);
 }
 export default Home;
