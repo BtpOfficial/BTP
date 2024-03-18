@@ -8,8 +8,8 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/users.js";
-import utilRoutes from "./routes/util.js"
+// import userRoutes from "./routes/users.js";
+// import utilRoutes from "./routes/util.js"
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
@@ -26,11 +26,11 @@ app.use(cors());
 app.use("/assets", express.static(path.join(__dirname, "public/assets")));
 
 app.use("/auth", authRoutes);
-app.use("/users",userRoutes);
-app.use("/",utilRoutes);
+// app.use("/users", userRoutes);
+// app.use("/", utilRoutes);
 
 /* MONGOOSE SETUP */
-const PORT = process.env.PORT || 6001;
+const PORT = process.env.PORT || 5000;
 mongoose
   .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,

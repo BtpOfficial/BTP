@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
-      default : "",
+      default: "",
     },
     email: {
       type: String,
@@ -20,29 +20,33 @@ const UserSchema = new mongoose.Schema(
       required: true,
       min: 5, // password length should be minimun of 5 characters
     },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"],
+    },
     qualification: {
       type: String,
-      enum: ["Intermediate", "High School", "Graduation" , "Post Graduation" , "Post Doctoral" , "Others"],
-      },
-    progress : {
-      type : [
+      enum: ["Intermediate", "High School", "Graduation", "Post Graduation", "Post Doctoral", "Others"],
+    },
+    progress: {
+      type: [
         {
-            subjectId : String,
-            courseList : [
-              {
-                courseId : String,
-                unitList : [
-                  {
-                    unitId : String,
-                    topicList : [String],
-                  }
-                ],
-                quizList : [String],
-              }
-            ],
+          subjectId: String,
+          courseList: [
+            {
+              courseId: String,
+              unitList: [
+                {
+                  unitId: String,
+                  topicList: [String],
+                }
+              ],
+              quizList: [String],
+            }
+          ],
         }
       ],
-      default : [],
+      default: [],
     }
   },
   { timestamps: true }
