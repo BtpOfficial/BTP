@@ -5,6 +5,7 @@ import Logo from "../../assets/logo.jpg"
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
 import { Link } from "react-router-dom";
+//{localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/Profile"} onClick={makeActiveSignUp}>MyProfile</Link>  </p>}
 const Navbar = () => {
     const [hide, sethide] = useState(false);
     const [Active1, setActive1] = useState(true);
@@ -56,6 +57,7 @@ const Navbar = () => {
                 <p className={`${Styles.nav_item} ${Active1 && Styles.active}`}> <Link to={"/"} onClick={makeActiveHome}>Home</Link></p>
                 {!localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active2 && Styles.active}`} > <Link to={"/login"} onClick={makeActiveLogin}>Login</Link>  </p>}
                 {!localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/signup"} onClick={makeActiveSignUp}>SignUp</Link>  </p>}
+                {!localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/Profile"} onClick={makeActiveSignUp}>MyProfile</Link>  </p>}
                 {localStorage.getItem("token") && <p onClick={logoutfunc} className={Styles.nav_item}>LogOut </p>}
             </div>
         </div>

@@ -5,6 +5,7 @@ import Navbar from './Pages/Navbar/Navbar.jsx';
 import Login from './Pages/Login/Login.js';
 import Register from './Pages/Login/Register.js';
 import Footer from './Pages/Footer/Footer.jsx';
+import Profile from './Pages/Myaccount/Profile.jsx';
 function App() {
   return (
     <>
@@ -14,6 +15,7 @@ function App() {
         <Route exact path='/' element={<Home />}></Route>
         <Route path='/login' element={<Login />}></Route>
         <Route path='/signup' element={<Register />}></Route>
+        <Route path='/profile' element={<Profile />}></Route>
       </Routes>
       <Footer />
     </>
