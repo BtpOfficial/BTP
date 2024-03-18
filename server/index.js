@@ -9,7 +9,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
-import utilRoutes from "./routes/util.js"
+import utilRoutes from "./routes/util.js";
+
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);

@@ -24,6 +24,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["Intermediate", "High School", "Graduation" , "Post Graduation" , "Post Doctoral" , "Others"],
       },
+      gender : {
+        type: String,
+        enum: ["Male", "Female", "Other"]
+      },
     progress : {
       type : [
         {
