@@ -32,7 +32,7 @@ const Login = () => {
 
       localStorage.setItem("token", token);
       navigate('/');
-      // window.location.reload();
+      window.location.reload();
     }
   };
 
