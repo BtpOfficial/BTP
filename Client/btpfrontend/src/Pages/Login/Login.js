@@ -1,14 +1,15 @@
 // src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { setLogin } from '../../state';
 const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -28,8 +29,7 @@ const Login = () => {
     if (res.status === 200) {
       const data = await res.json()
       const token = data.token
-      console.log(data)
-
+      dispatch(setLogin(data));
       localStorage.setItem("token", token);
       navigate('/');
       window.location.reload();
