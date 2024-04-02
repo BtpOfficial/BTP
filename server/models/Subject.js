@@ -6,9 +6,9 @@ const SubjectSchema = new mongoose.Schema(
         type : String,
         required : true,
     },
-    courseList:{
-        type : [String] ,
-        default : [],
+    courseList: {
+      type: Map,
+      of: String, 
     }
   },
   { timestamps: true }

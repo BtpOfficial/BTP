@@ -11,7 +11,7 @@ export const register = async (req, res) => {
       email,
       password,
       gender,
-      qualification,
+      qualification
     } = req.body;
     // console.log("gaurav");
     // console.log(req.body);

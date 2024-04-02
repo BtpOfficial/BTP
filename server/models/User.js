@@ -20,13 +20,13 @@ const UserSchema = new mongoose.Schema(
       required: true,
       min: 5, // password length should be minimun of 5 characters
     },
-    gender: {
-      type: String,
-      enum: ["Male", "Female", "Other"],
-    },
     qualification: {
       type: String,
       enum: ["Intermediate", "High School", "Graduation", "Post Graduation", "Post Doctoral", "Others"],
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"]
     },
     progress: {
       type: [
