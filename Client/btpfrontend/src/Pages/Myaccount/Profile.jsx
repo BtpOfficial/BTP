@@ -1,9 +1,21 @@
 import React from 'react';
+import { useEffect } from 'react';
 import IMG from "../../assets/profile.jpg";
 import { useSelector } from "react-redux";
+import { useNavigate } from 'react-router-dom'
 const Profile = () => {
+  const navigate = useNavigate();
   const data = useSelector((state) => state.user);
-  console.log(data)
+ // console.log(data)
+  const isprofile =  ()=> {if(!data){
+    console.log(data)
+    navigate('/');
+  }}
+  useEffect(() => {
+    isprofile();
+  }, []);
+  
+
   const profileData = {
     firstName: data?.firstName,
     lastName: data?.lastName,
