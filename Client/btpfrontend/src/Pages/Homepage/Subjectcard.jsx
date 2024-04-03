@@ -6,7 +6,7 @@ function Subjectcard(props) {
         <>
             <div className={Styles.cardin}>
                 <img className={Styles.cardimg} src={IMG} position='top' alt='IMG' />
-                <p>{props.details.subject}</p>
+                <p>{props.details.title}</p>
             </div>
         </>
     );
