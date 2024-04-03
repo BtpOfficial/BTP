@@ -1,9 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Styles from "./Items.module.css"
 import data from './data.js'
 import Subjectcard from "./Subjectcard.jsx";
 const Items = () => {
-    console.log(data)
+    const getdata = async () => {
+        var res;
+        try {
+            res = await fetch('http://localhost:3001/', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            })
+        } catch (error) {
+            console.error('Data not found', error.message);
+        }
+        const data = await res.json();
+    }
+
+    useEffect(() => {
+        getdata();
+    }, []);
+
     return (<>
         <div className={Styles.maincont}>
             <div className={Styles.subcard}>
