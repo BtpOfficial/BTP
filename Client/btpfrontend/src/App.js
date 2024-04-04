@@ -7,7 +7,7 @@ import Register from './Pages/Login/Register.js';
 import Footer from './Pages/Footer/Footer.jsx';
 import Profile from './Pages/Myaccount/Profile.jsx';
 import CourseList from './Pages/courses/CourseList.jsx';
-import CoursePage from './Pages/courses/CourseList.jsx';
+import TopicContent from './topicContent/TopicContent.jsx';
 function App() {
   return (
     <>

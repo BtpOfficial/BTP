@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams , useLocation} from 'react-router-dom';
 import homeimg from '../../assets/homeimg.png'
-
+import './cslist.css';
 function CourseList(props) {
     const [data, setData] = useState([]);
     const { subjectId } = useParams();
@@ -27,7 +27,7 @@ function CourseList(props) {
     console.log(data);
     return (
       <div className="bg-gray-100 min-h-screen flex justify-center items-center">
-      <div className="max-w-4xl w-full bg-white p-8 rounded-lg shadow-lg flex flex-col lg:flex-row">
+      <div className="max-w-4xl w-full bg-white p-16 rounded-lg shadow-lg flex flex-col lg:flex-row mt-6 mb-6">
         <div className="lg:w-1/2">
           <h1 className="text-3xl font-bold mb-6">{title}</h1>
           <div className="flex justify-center lg:justify-start mb-6">
@@ -36,7 +36,7 @@ function CourseList(props) {
         </div>
         <div className="lg:w-1/2 lg:pl-8">
           <h2 className="text-xl font-bold mb-4">Course List</h2>
-          <div className="overflow-y-scroll ..." >
+          <div className = "raghav" >
             {
               data.map((course, index) => (
               <div key={index} className={`${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}  p-2 rounded-md mb-2`}>
