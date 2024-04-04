@@ -26,7 +26,7 @@ const Items = () => {
             <div className={Styles.subcard}>
                 {
                     data.map((value) => (
-                        <Link to={`/${value._id}`}>
+                        <Link to={`/${value._id}?title=${value.title}`}>
                             <div key={value.id} className={Styles.cards}>
                                 <Subjectcard details={value} />
                             </div>

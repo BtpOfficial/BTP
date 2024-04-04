@@ -7,6 +7,7 @@ import Register from './Pages/Login/Register.js';
 import Footer from './Pages/Footer/Footer.jsx';
 import Profile from './Pages/Myaccount/Profile.jsx';
 import CourseList from './Pages/courses/CourseList.jsx';
+import CoursePage from './Pages/courses/CourseList.jsx';
 function App() {
   return (
     <>
@@ -17,8 +18,8 @@ function App() {
         <Route path='/login' element={<Login />}></Route>
         <Route path='/signup' element={<Register />}></Route>
         <Route path='/profile' element={<Profile />}></Route>
-        <Route path='/:subjectId' element={<CourseList />}></Route >
-      </Routes >
+        <Route path='/:subjectId' element={<CourseList />}></Route>
+      </Routes>
       <Footer />
     </>
   );
