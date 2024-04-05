@@ -4,7 +4,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom'; // Import BrowserRouter
-import { authReducer, activeReducer } from "./state";
+import { authReducer } from './state/userslice';
+import { activeReducer } from './state/activeSlice';
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -21,7 +22,7 @@ import {
 
 // Information stored in the local storage even if browser is closed
 const persistConfig = { key: "root", storage, version: 1 };
-const persistedReducer = persistReducer(persistConfig, authReducer, activeReducer);
+const persistedReducer = persistReducer(persistConfig, activeReducer, authReducer);
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
