@@ -12,7 +12,7 @@ export default function Footer() {
         <footer className={Styles.footer_distributed}>
 
             <div className={Styles.footer_left}>
-                <h3>Kumar<span>Academy</span></h3>
+                <h3>Learn<span>Hub</span></h3>
 
                 <p className={Styles.footer_links}>
                     <a href="#">&nbsp;Home&nbsp; </a>
@@ -24,7 +24,7 @@ export default function Footer() {
                     <a href="#">&nbsp;Blog&nbsp;</a>
                 </p>
 
-                <p className={Styles.footer_company_name}>Copyright © 2021 <strong>Kumar Academy</strong> All rights reserved</p>
+                <p className={Styles.footer_company_name}>Copyright © 2021 <strong>LearnHub</strong> All rights reserved</p>
             </div>
 
             <div className={Styles.footer_center}>

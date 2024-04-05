@@ -1,0 +1,27 @@
+.container {
+    display: flex;
+    max-height: 600px;
+}
+
+.left {
+    width: 25%;
+    overflow-y: scroll;
+}
+
+.right {
+    width: 75%;
+    overflow-y: scroll;
+}
+
+.left_list {
+    padding: 10px;
+    height: 80px;
+    transition: all 300ms ease;
+    border-bottom: 1px solid rgb(202, 202, 202);
+
+}
+
+.left_list:hover {
+    cursor: pointer;
+    background-color: rgb(226, 219, 219);
+}

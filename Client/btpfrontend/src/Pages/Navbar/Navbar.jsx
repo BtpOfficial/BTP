@@ -47,7 +47,7 @@ const Navbar = () => {
             <div className={Styles.second}>
                 <div className={Styles.secondin}>
                     <img className={Styles.logo} src={Logo} alt="LOGO"></img>
-                    <div className={Styles.name}> Kumar Academy</div>
+                    <div className={Styles.name}> LearnHub</div>
                 </div>
                 {!hide ?
                     <div className={Styles.burger}><RxHamburgerMenu onClick={showbar} /></div>
