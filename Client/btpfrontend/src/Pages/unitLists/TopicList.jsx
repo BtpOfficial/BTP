@@ -16,6 +16,7 @@ function TopicList() {
             console.error('Data not found', error.message);
         }
     };
+
     useEffect(() => {
         getdata();
     }, [topicId]);
