@@ -23,8 +23,7 @@ function App() {
         <Route path='/profile' element={<Profile />}></Route>
         <Route path='/:subjectId' element={<CourseList />}></Route>
         <Route path='/:subjectId/:courseId' element={<UnitList />}>
-          <Route path=':topicId' element={<TopicList />}>
-          </Route>
+          <Route path=':topicId' element={<TopicList />}></Route>
           <Route path='' element={<DefaultPage />}></Route>
         </Route>
         <Route path='/:subjectId/:courseId/:topicId/:contentId' element={<TopicContent />}></Route>

@@ -18,7 +18,7 @@ function TopicList() {
     };
     useEffect(() => {
         getdata();
-    }, []);
+    }, [topicId]);
     return (
         <>
 
