@@ -41,4 +41,5 @@
     display: flex;
     row-gap: 10px;
     flex-direction: column;
+    min-height: 230px;
 }
