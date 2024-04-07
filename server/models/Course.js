@@ -7,12 +7,12 @@ const CourseSchema = new mongoose.Schema(
         required : true,
     },
     unitList : {
-        type : [String],
-        default : [],
+        type : Map,
+        of : String,
     },
-    quizzes : {
+    quizList : {
         type : [String],
-        default : {}
+        default : []
     }
   },
   { timestamps: true }

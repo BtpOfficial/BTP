@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
-      default : "",
+      default: "",
     },
     email: {
       type: String,
@@ -22,27 +22,31 @@ const UserSchema = new mongoose.Schema(
     },
     qualification: {
       type: String,
-      enum: ["Intermediate", "High School", "Graduation" , "Post Graduation" , "Post Doctoral" , "Others"],
-      },
-    progress : {
-      type : [
+      enum: ["Intermediate", "High School", "Graduation", "Post Graduation", "Post Doctoral", "Others"],
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"]
+    },
+    progress: {
+      type: [
         {
-            subjectId : String,
-            courseList : [
-              {
-                courseId : String,
-                unitList : [
-                  {
-                    unitId : String,
-                    topicList : [String],
-                  }
-                ],
-                quizList : [String],
-              }
-            ],
+          subjectId: String,
+          courseList: [
+            {
+              courseId: String,
+              unitList: [
+                {
+                  unitId: String,
+                  topicList: [String],
+                }
+              ],
+              quizList: [String],
+            }
+          ],
         }
       ],
-      default : [],
+      default: [],
     }
   },
   { timestamps: true }

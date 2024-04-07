@@ -4,8 +4,10 @@ import { CiSearch } from "react-icons/ci";
 import Logo from "../../assets/logo.jpg"
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+//{localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/Profile"} onClick={makeActiveSignUp}>MyProfile</Link>  </p>}
 const Navbar = () => {
+    const navigate = useNavigate();
     const [hide, sethide] = useState(false);
     const [Active1, setActive1] = useState(true);
     const [Active2, setActive2] = useState(false);
@@ -28,6 +30,11 @@ const Navbar = () => {
     const showbar = () => {
         sethide(!hide);
     }
+    const logoutfunc = () => {
+        window.location.reload();
+        localStorage.clear();
+        navigate('/');
+    }
     return (<>
         <div className={Styles.main}>
             <div className={Styles.first}>
@@ -38,10 +45,10 @@ const Navbar = () => {
                 </div>
             </div>
             <div className={Styles.second}>
-                <div className={Styles.secondin}>
+                <Link to={'/'}><div onClick={makeActiveHome} className={Styles.secondin}>
                     <img className={Styles.logo} src={Logo} alt="LOGO"></img>
-                    <div className={Styles.name}> Kumar Academy</div>
-                </div>
+                    <div className={Styles.name}> LearnHub</div>
+                </div></Link>
                 {!hide ?
                     <div className={Styles.burger}><RxHamburgerMenu onClick={showbar} /></div>
                     :
@@ -49,10 +56,11 @@ const Navbar = () => {
                 }
             </div>
             <div className={`${Styles.third}  ${hide ? Styles.special : ''}`} >
-                <p className={`${Styles.nav_item} ${Active1 && Styles.active}`} onClick={makeActiveHome}> <Link to={"/"}>Home</Link> </p>
-                <p className={`${Styles.nav_item} ${Active2 && Styles.active}`} onClick={makeActiveLogin}> <Link to={"/login"}>Login</Link>  </p>
-                <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} onClick={makeActiveSignUp}><Link to={"/signup"}>SignUp</Link>  </p>
-                {/* <p className={Styles.nav_item}>LogOut </p> */}
+                <p className={`${Styles.nav_item} ${Active1 && Styles.active}`}> <Link to={"/"} onClick={makeActiveHome}>Home</Link></p>
+                {!localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active2 && Styles.active}`} > <Link to={"/login"} onClick={makeActiveLogin}>Login</Link>  </p>}
+                {!localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/signup"} onClick={makeActiveSignUp}>SignUp</Link>  </p>}
+                {localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/Profile"} onClick={makeActiveSignUp}>MyProfile</Link>  </p>}
+                {localStorage.getItem("token") && <p onClick={logoutfunc} className={Styles.nav_item}>LogOut </p>}
             </div>
         </div>
     </>

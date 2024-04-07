@@ -7,8 +7,8 @@ const UnitSchema = new mongoose.Schema(
         required : true,
     },
     topicList : {
-        type : [String] ,
-        default : [],
+        type : Map,
+        of : String,
     }
   },
   { timestamps: true }
