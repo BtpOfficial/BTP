@@ -1,8 +1,8 @@
 // src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setLogin } from '../../state/userslice';
+import { useDispatch, useSelector } from "react-redux";
+import { setLogin } from '../../state/authSlice';
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,10 +32,11 @@ const Login = () => {
       dispatch(setLogin(data));
       localStorage.setItem("token", token);
       navigate('/');
-      window.location.reload();
+      // window.location.reload();
     }
   };
-
+  const data1 = useSelector((state) => state.user);
+  console.log(data1);
   return (
     <div className="##243c5a min-h-screen flex items-center justify-center">
       <div className="#061d3c p-8 rounded-lg shadow-2xl w-full max-w-md">

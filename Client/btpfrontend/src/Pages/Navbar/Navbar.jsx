@@ -45,10 +45,10 @@ const Navbar = () => {
                 </div>
             </div>
             <div className={Styles.second}>
-                <div className={Styles.secondin}>
+                <Link to={'/'}><div onClick={makeActiveHome} className={Styles.secondin}>
                     <img className={Styles.logo} src={Logo} alt="LOGO"></img>
                     <div className={Styles.name}> LearnHub</div>
-                </div>
+                </div></Link>
                 {!hide ?
                     <div className={Styles.burger}><RxHamburgerMenu onClick={showbar} /></div>
                     :

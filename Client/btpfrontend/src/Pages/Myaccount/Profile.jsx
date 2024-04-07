@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 const Profile = () => {
   const navigate = useNavigate();
   const data = useSelector((state) => state.user);
+  const data1 = useSelector((state) => state.id)
+  console.log(data1);
   const isprofile = () => {
     if (!data) {
       console.log(data)
