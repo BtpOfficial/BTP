@@ -37,8 +37,9 @@ function CourseList(props) {
                     <div className="overflow-y-scroll ..." >
                         {
                             data.map((course, index) => (
-                                <div key={index} className={`${index % 2 === 0 ? 'bg-gray-200' : 'bg-white'}  p-2 rounded-md mb-2`}>
-                                    <Link to={`/${subjectId}/${course._id}`}><p className="text-lg">{course.title}</p></Link>
+                                course &&
+                                <div key={index} className={` bg-gray-200  p-2 rounded-md mb-2`}>
+                                    <Link to={`/${subjectId}/${course?._id}`}><p className="text-lg">{course?.title}</p></Link>
                                 </div>
                             ))
                         }

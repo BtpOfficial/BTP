@@ -9,7 +9,7 @@ import Profile from './Pages/Myaccount/Profile.jsx';
 import CourseList from './Pages/courses/CourseList.jsx';
 import UnitList from './Pages/unitLists/UnitList.jsx';
 import TopicList from './Pages/unitLists/TopicList.jsx';
-import TopicContent from './topicContent/TopicContent.jsx';
+import TopicContent from './Pages/topicContent/TopicContent.jsx';
 import DefaultPage from './Pages/unitLists/DefaultPage.jsx';
 function App() {
   return (
