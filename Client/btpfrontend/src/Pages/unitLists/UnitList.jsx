@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link, Outlet, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from "react-redux";
 import { setId } from "../../state/authSlice";
-// import { setId } from "../../state/authSlice"; // Correct import path
 import Styles from './UnitList.module.css';
 
 function UnitList() {
@@ -29,6 +28,7 @@ function UnitList() {
 
     const ID = useSelector((state) => state.id); // Access auth slice
     console.log(ID);
+
 
     useEffect(() => {
         getdata();

@@ -6,6 +6,8 @@
 .left {
     width: 25%;
     overflow-y: scroll;
+    padding-left: 10px;
+
 }
 
 .right {
@@ -18,14 +20,16 @@
     height: 80px;
     transition: all 300ms ease;
     border-bottom: 1px solid rgb(202, 202, 202);
-
+    border-left: 4px solid rgb(255, 255, 255);
 }
 
 .left_list:hover {
     cursor: pointer;
     background-color: rgb(226, 219, 219);
+    border-left: 4px solid #F0624F;
 }
 
 .active {
     background-color: rgb(226, 219, 219);
+    border-left: 4px solid #F0624F;
 }
