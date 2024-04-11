@@ -56,10 +56,10 @@ const TopicContent = () => {
             <p>
               {data.content}
             </p>
-            <div className="flex items-center mt-4">
+            {/* <div className="flex items-center mt-4">
               <input type="checkbox" onChange={handleChange} className="mr-2" />
               <label htmlFor="completedCheckbox">Mark Completed</label>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
