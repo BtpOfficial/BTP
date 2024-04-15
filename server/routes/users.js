@@ -6,7 +6,11 @@ import {
   addUnit,
   addQuiz,
   addCourse,
-  addSubject
+  addSubject,
+  delTopic,
+  delUnit,
+  delCourse,
+  delSubject
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -20,5 +24,9 @@ router.post("/:subjectId/:courseId/add/quiz", addQuiz);
 router.post("/:subjectId/add",addCourse);
 router.post("/add", addSubject);
 
+router.post("/:subjectId/:courseId/:unitId/:topicId/delete", delTopic);
+router.post("/:subjectId/:courseId/:unitId/delete", delUnit);
+router.post("/:subjectId/:courseId/delete", delCourse);
+router.post("/:subjectId/delete", delSubject);
 
 export default router;
