@@ -34,9 +34,6 @@ const TopicContent = () => {
     } catch (error) {
       console.error('Registration failed', error.message);
     }
-    // if (res.status === 200) {
-    //   console.log(res.json())
-    // }
   };
   useEffect(() => {
     getdata();
@@ -56,10 +53,6 @@ const TopicContent = () => {
             <p>
               {data.content}
             </p>
-            {/* <div className="flex items-center mt-4">
-              <input type="checkbox" onChange={handleChange} className="mr-2" />
-              <label htmlFor="completedCheckbox">Mark Completed</label>
-            </div> */}
           </div>
         </div>
       </div>
