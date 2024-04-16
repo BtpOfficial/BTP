@@ -398,3 +398,14 @@ export const verifyQuiz = async(req,res) => {
     }
 }
 
+export const getQuiz = async(req,res) => {
+    try {
+        const { topicId } = req.params;
+        const quiz = await Quiz.findOne({topicId : topicId});
+        res.json(201).json(quiz);
+
+    } catch(err) {
+        res.status(400).json({ message: err.message });
+
+    }
+}
