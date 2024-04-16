@@ -41,13 +41,12 @@ const UserSchema = new mongoose.Schema(
                   topicList: [String],
                 }
               ],
-              quizList: [String],
             }
           ],
         }
       ],
       default: [],
-    }
+    },
   },
   { timestamps: true }
 );

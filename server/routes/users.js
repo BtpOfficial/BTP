@@ -4,9 +4,15 @@ import {
   markCompleteQuestion,
   addTopic,
   addUnit,
-  addQuiz,
+  addOrUpdateQuiz,
   addCourse,
-  addSubject
+  addSubject,
+  delTopic,
+  delUnit,
+  delCourse,
+  delSubject,
+  verifyQuiz,
+  getQuiz
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -16,9 +22,15 @@ router.post("/:subjectId/:courseId/:unitId/:topicId/read", verifyToken, markComp
 router.post("/:subjectId/:courseId/:quizId/quiz", verifyToken, markCompleteQuestion);
 router.post("/:subjectId/:courseId/:unitId/add", addTopic);
 router.post("/:subjectId/:courseId/add",  addUnit);
-router.post("/:subjectId/:courseId/add/quiz", addQuiz);
+router.post("/:topicId/addorupdatequiz", addOrUpdateQuiz);
+router.get("/:quizId/verifyquiz",verifyQuiz);
+router.get("/:topicId/getquiz", getQuiz );
 router.post("/:subjectId/add",addCourse);
 router.post("/add", addSubject);
 
+router.post("/:subjectId/:courseId/:unitId/:topicId/delete", delTopic);
+router.post("/:subjectId/:courseId/:unitId/delete", delUnit);
+router.post("/:subjectId/:courseId/delete", delCourse);
+router.post("/:subjectId/delete", delSubject);
 
 export default router;
