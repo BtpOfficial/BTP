@@ -1,4 +1,5 @@
 import Course from "../models/Course.js";
+import Quiz from "../models/Quiz.js";
 import Subject from "../models/Subject.js";
 import Topic from "../models/Topic.js";
 import Unit from "../models/Unit.js";
@@ -72,6 +73,7 @@ export const markComplete = async (req, res) => {
     }
 };
 
+// need to change
 export const markCompleteQuestion = async (req, res) => {
     try {
         const { subjectId, courseId, quizId } = req.params;
@@ -179,21 +181,22 @@ export const addUnit = async (req, res) => {
     }
 }
 
-export const addQuiz = async (req, res) => {
+export const addOrUpdateQuiz = async (req, res) => {
     try {
-        const { subjectId, courseId } = req.params;
-        const { title } = req.body;
-        const newQuiz = new Quiz({
-            title,
-        });
-
-        const savedQuiz = await newQuiz.save();
-
-        const course = await Course.findById(courseId);
-        course.quizList.push(savedQuiz._id);
-        await course.save()
-
-        res.status(201).json(savedQuiz);
+        const { topicId } = req.params;
+        const { quizArray } = req.body;
+        const quiz = await Quiz.findOne({ topicId : topicId })
+        if(!quiz) {
+            const newQuiz = new Quiz({
+                topicId,
+                quizArray,
+            });
+            const savedQuiz = await newQuiz.save();
+            return res.status(201).json(savedQuiz);
+        }
+        quiz.quizArray = quizArray;
+        await quiz.save();
+        res.status(201).json(quiz);
 
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -205,14 +208,11 @@ export const addCourse = async (req, res) => {
         const { subjectId } = req.params;
         const { title } = req.body;
         const unitList = new Map();
-        const quizList = [];
         const newCourse = new Course({
             title,
             unitList,
-            quizList,
         });
         const savedCourse = await newCourse.save();
-
         const subject = await Subject.findById(subjectId);
         subject.courseList.set(savedCourse._id, title);
         await subject.save()
@@ -247,6 +247,10 @@ export const delTopic = async (req, res) => {
         // Delete the topic
         await Topic.findByIdAndDelete(topicId);
         
+        const quiz = await Quiz.findOne({topicId : topicId})
+        if(quiz) {
+            await Quiz.findByIdAndDelete(quiz._id);
+        }
         // Find the unit and remove the topic from the topicList map
         const unit = await Unit.findById(unitId);
         if (unit.topicList.has(topicId)) {
@@ -367,6 +371,30 @@ export const delSubject = async (req, res) => {
         res.status(201).json("Deletion successful");
     } catch(err) {
         res.status(400).json({ message: err.message });
+    }
+}
+
+
+export const verifyQuiz = async(req,res) => {
+    try {
+        const { quizId  } = req.params;
+        const quiz = await Quiz.findById(quizId);
+        const { response } = req.body; // Assuming it is an array
+        const totalQuestions = Math.min(quiz.quizArray.length,response.length);
+        let score = 0;
+        for (let i = 0; i < totalQuestions; i++) {
+            if(response[i] === quiz.quizArray[i].correct) {
+                score += 1;
+            }
+        }
+        if(totalQuestions !== 0) {
+            score = (score /totalQuestions)*100;
+        }
+        res.status(200).json(score);
+
+    } catch(err) {
+        res.status(400).json({ message: err.message });
+
     }
 }
 

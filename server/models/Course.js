@@ -10,10 +10,6 @@ const CourseSchema = new mongoose.Schema(
         type : Map,
         of : String,
     },
-    quizList : {
-        type : [String],
-        default : []
-    }
   },
   { timestamps: true }
 );
