@@ -378,11 +378,10 @@ export const delSubject = async (req, res) => {
 export const verifyQuiz = async (req, res) => {
     try {
         const { quizId } = req.params;
-        console.log(req.body);
+        const { response } = req.body;
         const quiz = await Quiz.findById(quizId);
-        const { response } = req.body; // Assuming it is an array
-        console.log(response)
-        const totalQuestions = Math.min(quiz.quizArray.length, response.length);
+        console.log(quiz);
+        const totalQuestions = quiz.quizArray.length;
         let score = 0;
         const letterToNumber = {
             "A": "0",
@@ -390,8 +389,16 @@ export const verifyQuiz = async (req, res) => {
             "C": "2",
             "D": "3",
         };
+        const extractedValues = [];
+
+        for (let i = 0; i < response.length; i++) {
+            const value = response[i];
+            if (value === '0' || value === '1' || value === '2' || value === '3') {
+                extractedValues.push(value);
+            }
+        }
         for (let i = 0; i < totalQuestions; i++) {
-            if (response[i] === letterToNumber[quiz.quizArray[i].correct]) {
+            if (extractedValues[i] === letterToNumber[quiz.quizArray[i].correct]) {
                 score += 1;
             }
         }
@@ -410,7 +417,9 @@ export const getQuiz = async (req, res) => {
     try {
         const { topicId } = req.params;
         const quiz = await Quiz.findOne({ topicId: topicId });
-        console.log(quiz);
+        if (!quiz) {
+            return res.status(404).json({ message: "Quiz not found" });
+        }
         const newArray = [];
         quiz.quizArray.forEach(quizItem => {
             const modifiedQuiz = {
