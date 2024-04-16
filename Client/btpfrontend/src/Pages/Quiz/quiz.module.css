@@ -53,3 +53,10 @@
     align-items: center;
     margin: auto;
 }
+
+.score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(206, 252, 206);
+}
