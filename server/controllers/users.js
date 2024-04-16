@@ -185,8 +185,8 @@ export const addOrUpdateQuiz = async (req, res) => {
     try {
         const { topicId } = req.params;
         const { quizArray } = req.body;
-        const quiz = await Quiz.findOne({ topicId : topicId })
-        if(!quiz) {
+        const quiz = await Quiz.findOne({ topicId: topicId })
+        if (!quiz) {
             const newQuiz = new Quiz({
                 topicId,
                 quizArray,
@@ -243,12 +243,12 @@ export const addSubject = async (req, res) => {
 export const delTopic = async (req, res) => {
     try {
         const { subjectId, courseId, unitId, topicId } = req.params;
-        
+
         // Delete the topic
         await Topic.findByIdAndDelete(topicId);
-        
-        const quiz = await Quiz.findOne({topicId : topicId})
-        if(quiz) {
+
+        const quiz = await Quiz.findOne({ topicId: topicId })
+        if (quiz) {
             await Quiz.findByIdAndDelete(quiz._id);
         }
         // Find the unit and remove the topic from the topicList map
@@ -270,18 +270,18 @@ export const delTopic = async (req, res) => {
 export const delUnit = async (req, res) => {
     try {
         const { subjectId, courseId, unitId } = req.params;
-        
+
         // Find the unit
         const unit = await Unit.findById(unitId);
-        
+
         // Delete topics associated with the unit
         for (const [topicId, topic] of unit.topicList.entries()) {
             await Topic.findByIdAndDelete(topicId);
         }
-        
+
         // Delete the unit itself
         await Unit.findByIdAndDelete(unitId);
-        
+
         // Update the course to remove the unit
         const course = await Course.findById(courseId);
         if (course.unitList.has(unitId)) {
@@ -292,7 +292,7 @@ export const delUnit = async (req, res) => {
             res.status(404).json({ message: "Unit not found in the course" });
         }
 
-    } catch(err) {
+    } catch (err) {
         res.status(400).json({ message: err.message });
     }
 }
@@ -301,26 +301,26 @@ export const delUnit = async (req, res) => {
 export const delCourse = async (req, res) => {
     try {
         const { subjectId, courseId } = req.params;
-        
+
         // Find the course
         const course = await Course.findById(courseId);
-        
+
         // Iterate over unitList
         for (const [unitId, unitTitle] of course.unitList.entries()) {
             const unit = await Unit.findById(unitId);
-            
+
             // Iterate over topicList
             for (const [topicId, topicTitle] of unit.topicList.entries()) {
                 await Topic.findByIdAndDelete(topicId);
             }
-            
+
             // Delete the unit
             await Unit.findByIdAndDelete(unitId);
         }
 
         // Delete the course itself
         await Course.findByIdAndDelete(courseId);
-        
+
         // Remove courseId from subject.courseList
         const subject = await Subject.findById(subjectId);
         if (subject.courseList.has(courseId)) {
@@ -331,7 +331,7 @@ export const delCourse = async (req, res) => {
             res.status(404).json({ message: "Course not found in the subject" });
         }
 
-    } catch(err) {
+    } catch (err) {
         res.status(400).json({ message: err.message });
     }
 }
@@ -340,7 +340,7 @@ export const delCourse = async (req, res) => {
 export const delSubject = async (req, res) => {
     try {
         const { subjectId } = req.params;
-        
+
         // Find the subject
         const subject = await Subject.findById(subjectId);
 
@@ -369,42 +369,59 @@ export const delSubject = async (req, res) => {
         await Subject.findByIdAndDelete(subjectId);
 
         res.status(201).json("Deletion successful");
-    } catch(err) {
+    } catch (err) {
         res.status(400).json({ message: err.message });
     }
 }
 
 
-export const verifyQuiz = async(req,res) => {
+export const verifyQuiz = async (req, res) => {
     try {
-        const { quizId  } = req.params;
+        const { quizId } = req.params;
+        console.log(req.body);
         const quiz = await Quiz.findById(quizId);
         const { response } = req.body; // Assuming it is an array
-        const totalQuestions = Math.min(quiz.quizArray.length,response.length);
+        console.log(response)
+        const totalQuestions = Math.min(quiz.quizArray.length, response.length);
         let score = 0;
+        const letterToNumber = {
+            "A": "0",
+            "B": "1",
+            "C": "2",
+            "D": "3",
+        };
         for (let i = 0; i < totalQuestions; i++) {
-            if(response[i] === quiz.quizArray[i].correct) {
+            if (response[i] === letterToNumber[quiz.quizArray[i].correct]) {
                 score += 1;
             }
         }
-        if(totalQuestions !== 0) {
-            score = (score /totalQuestions)*100;
+        if (totalQuestions !== 0) {
+            score = (score / totalQuestions) * 100;
         }
         res.status(200).json(score);
 
-    } catch(err) {
+    } catch (err) {
         res.status(400).json({ message: err.message });
 
     }
 }
 
-export const getQuiz = async(req,res) => {
+export const getQuiz = async (req, res) => {
     try {
         const { topicId } = req.params;
-        const quiz = await Quiz.findOne({topicId : topicId});
-        res.json(201).json(quiz);
-
-    } catch(err) {
+        const quiz = await Quiz.findOne({ topicId: topicId });
+        console.log(quiz);
+        const newArray = [];
+        quiz.quizArray.forEach(quizItem => {
+            const modifiedQuiz = {
+                question: quizItem.question,
+                options: quizItem.options
+            };
+            newArray.push(modifiedQuiz);
+        });
+        quiz.quizArray = newArray;
+        res.status(201).json(quiz);
+    } catch (err) {
         res.status(400).json({ message: err.message });
 
     }
