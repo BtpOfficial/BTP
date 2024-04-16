@@ -39,7 +39,7 @@ function CourseList(props) {
                             data.map((course, index) => (
                                 course &&
                                 <div key={index} className={` bg-gray-200  p-2 rounded-md mb-2`}>
-                                    <Link to={`/${subjectId}/${course?._id}`}><p className="text-lg">{course?.title}</p></Link>
+                                    <Link to={`/${subjectId}/${course._id}`}><p className="text-lg">{course.title}</p></Link>
                                 </div>
                             ))
                         }

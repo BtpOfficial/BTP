@@ -11,6 +11,7 @@ import UnitList from './Pages/unitLists/UnitList.jsx';
 import TopicList from './Pages/unitLists/TopicList.jsx';
 import TopicContent from './Pages/topicContent/TopicContent.jsx';
 import DefaultPage from './Pages/unitLists/DefaultPage.jsx';
+import Quiz from './Pages/Quiz/quiz.jsx'
 function App() {
   return (
     <>
@@ -27,6 +28,7 @@ function App() {
           <Route path='' element={<DefaultPage />}></Route>
         </Route>
         <Route path='/:subjectId/:courseId/:topicId/:contentId' element={<TopicContent />}></Route>
+        <Route path='/quiz/:topicId' element={<Quiz />}></Route>
       </Routes>
       <Footer />
     </>

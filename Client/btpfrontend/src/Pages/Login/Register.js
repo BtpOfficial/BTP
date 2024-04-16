@@ -1,6 +1,7 @@
 // src/components/Register.js
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import { message } from 'antd';
 const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -30,6 +31,7 @@ const Register = () => {
       console.error('Registration failed', error.message);
     }
     if (res.status === 201) {
+      message.success("Registered Successfully");
       navigate('/login');
     }
   };

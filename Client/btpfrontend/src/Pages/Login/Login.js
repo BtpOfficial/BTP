@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from '../../state/authSlice';
+import { message } from 'antd';
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const Login = () => {
       console.error('Registration failed', error.message);
     }
     if (res.status === 200) {
+      message.success("Login Successfully");
       const data = await res.json()
       const token = data.token
       dispatch(setLogin(data));
