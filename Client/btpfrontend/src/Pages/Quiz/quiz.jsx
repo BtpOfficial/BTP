@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import questions from "./data.js"
 import Styles from "./quiz.module.css"
@@ -6,13 +6,37 @@ import { message } from 'antd';
 
 const Quiz = () => {
     const { topicId } = useParams();
+    // const getquiz = async() => {
+    //     try {
+    //         const res = await fetch('http://localhost:3001/', {
+    //             method: 'GET',
+    //             headers: { 'Content-Type': 'application/json' },
+    //         });
+    //         const fetchedData = await res.json();
+    //         setData(fetchedData);
+    //     } catch (error) {
+    //         console.error('Data not found', error.message);
+    //     }
+    // }
     const [selectedOptions, setSelectedOptions] = useState(Array(questions.length).fill(null));
-    const handleSubmit = () => {
+
+    const handleSubmit = async () => {
         const hasNullOption = selectedOptions.some(option => option === null);
-        // If any selected option is null, log "hi" and return
         if (hasNullOption) {
-            message.success("Complete all questions");
+            message.info("Complete all questions");
             return;
+        }
+        var res;
+        try {
+            res = await fetch('http://localhost:3001//verifyquiz', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(selectedOptions)
+            })
+        } catch (error) {
+            message.error('Some error occured');
+        }
+        if (res.status === 200) {
         }
 
     }
@@ -21,6 +45,9 @@ const Quiz = () => {
         newSelectedOptions[questionIndex] = optionValue;
         setSelectedOptions(newSelectedOptions);
     };
+    useEffect(() => {
+        // getquiz();
+    }, [])
     return (
         <>
             <div className={Styles.container}>
