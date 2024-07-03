@@ -10,118 +10,107 @@ export const markComplete = async (req, res) => {
         const { subjectId, courseId, unitId, topicId } = req.params;
         const { userId } = req.body;
         const user = await User.findById(userId);
+        
         let progress = user.progress || [];
-        let t = -1;
-        for (let i = 0; i < progress.length; i++) {
-            if (progress[i].subjectId === subjectId) {
-                t = i;
-                break;
-            }
-        }
-        if (t === -1) {
+        let subjectIndex = progress.findIndex(item => item.subjectId === subjectId);
+        
+        if (subjectIndex === -1) {
             progress.push({
                 subjectId,
                 courseList: [],
-            })
-            t = progress.length - 1;
-        };
-
-        progress = progress[t].courseList;
-        t = -1;
-        for (let i = 0; i < progress.length; i++) {
-            if (progress[i].courseId === courseId) {
-                t = i;
-                break;
-            }
+            });
+            subjectIndex = progress.length - 1;
         }
-        if (t === -1) {
-            progress.push({
+        
+        let courseIndex = progress[subjectIndex].courseList.findIndex(item => item.courseId === courseId);
+        
+        if (courseIndex === -1) {
+            progress[subjectIndex].courseList.push({
                 courseId,
                 unitList: [],
-                quizList: [],
-            })
-            t = progress.length - 1;
+            });
+            courseIndex = progress[subjectIndex].courseList.length - 1;
         }
-
-        progress = progress[t].unitList;
-        t = -1;
-        for (let i = 0; i < progress.length; i++) {
-            if (progress[i].unitId === unitId) {
-                t = i;
-                break;
-            }
-        }
-        if (t === -1) {
-            progress.push({
+        
+        let unitIndex = progress[subjectIndex].courseList[courseIndex].unitList.findIndex(item => item.unitId === unitId);
+        
+        if (unitIndex === -1) {
+            progress[subjectIndex].courseList[courseIndex].unitList.push({
                 unitId,
                 topicList: [],
-            })
-            t = progress.length - 1;
+            });
+            unitIndex = progress[subjectIndex].courseList[courseIndex].unitList.length - 1;
         }
-
-        progress = progress[t].topicList;
-        t = progress.indexOf(topicId);
-        if (t === -1) {
-            progress.push(topicId);
+        
+        if (!progress[subjectIndex].courseList[courseIndex].unitList[unitIndex].topicList.includes(topicId)) {
+            progress[subjectIndex].courseList[courseIndex].unitList[unitIndex].topicList.push(topicId);
         }
-
-        const final_user = await user.save();
-        res.status(201).json(final_user);
-
+        
+        user.progress = progress;
+        const updatedUser = await user.save();
+        res.status(201).json(updatedUser);
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
 };
-
 // need to change
-export const markCompleteQuestion = async (req, res) => {
+export const verifyQuiz = async (req, res) => {
     try {
-        const { subjectId, courseId, quizId } = req.params;
-        const { userId } = req.body;
+        const { topicId, quizId } = req.params;
+        const { userId, user_response_mcq, user_response_descriptive } = req.body;
+
         const user = await User.findById(userId);
+        const quiz = await Quiz.findById(quizId);
 
-        let progress = user.progress || [];
-        let t = -1;
-        for (let i = 0; i < progress.length; i++) {
-            if (progress[i].subjectId === subjectId) {
-                t = i;
-                break;
+
+        if (!user || !quiz) {
+            return res.status(404).json({ message: "User or Quiz not found" });
+        }
+        const actual_mcq = quiz.quizArray.mcq.map(question => question.correct);
+        const actual_descriptive = quiz.quizArray.descriptive.map(question => question.answer);
+
+        let score = 0;
+        for (let i = 0; i < user_response_mcq.length; i++) {
+            if (user_response_mcq[i] === actual_mcq[i]) {
+                score += 1;
             }
         }
-        if (t === -1) {
-            progress.push({
-                subjectId,
-                courseList: [],
-            })
-            t = progress.length - 1;
-        };
 
-        progress = progress[t].courseList;
-        t = -1;
-        for (let i = 0; i < progress.length; i++) {
-            if (progress[i].courseId === courseId) {
-                t = i;
-                break;
-            }
-        }
-        if (t === -1) {
-            progress.push({
-                courseId,
-                unitList: [],
-                quizList: [],
-            })
-            t = progress.length - 1;
+        // this socre should also inculde some api callss
+
+        // Calculate score as a percentage
+        const totalQuestions = actual_mcq.length + actual_descriptive.length;
+        const scorePercentage = Math.round((score / totalQuestions) * 100);
+
+        // Find or create the progress entry for this topic
+        let topicProgress = user.progress_on_quiz.find(p => p.topicId === topicId);
+        if (!topicProgress) {
+            topicProgress = { topicId, value: [] };
+            user.progress_on_quiz.push(topicProgress);
         }
 
-        progress = progress[t].quizList;
-        t = progress.indexOf(quizId);
-        if (t === -1) {
-            progress.push(quizId);
+        // Find or create the quiz entry for this quiz
+        topicProgress = user.progress_on_quiz.find(p => p.topicId === topicId);
+        let quizProgress = topicProgress.value.find(q => q.quizId === quizId);
+        if (!quizProgress) {
+            quizProgress = { quizId, score: scorePercentage };
+            topicProgress.value.push(quizProgress);
+        } else {
+            quizProgress.score = scorePercentage;
         }
-        const final_user = await user.save()
-        res.status(200).json(final_user);
+        quizProgress = topicProgress.value.find(q => q.quizId === quizId);
+        // Ensure the score is within the allowed range
+        quizProgress.score = Math.max(-20, Math.min(100, quizProgress.score));
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Quiz evaluated successfully",
+            score: scorePercentage,
+            user: user
+        });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
 };
 
@@ -130,153 +119,221 @@ export const addTopic = async (req, res) => {
         const { subjectId, courseId, unitId } = req.params;
         const { title, content } = req.body;
 
-        const newTopic = new Topic({
-            title,
-            content,
-        });
+        // Create and save the new topic
+        const newTopic = new Topic({ title, content });
         const savedTopic = await newTopic.save();
 
+        // Update the unit
         const unit = await Unit.findById(unitId);
-        unit.topicList.set(savedTopic._id, title);
-        await unit.save()
+        if (!unit) {
+            return res.status(404).json({ message: "Unit not found" });
+        }
+        unit.topicList.set(savedTopic._id.toString(), title);
+        await unit.save();
 
+        // Update the course
         const course = await Course.findById(courseId);
-        course.unitList.set(unit._id, unit.title);
-        await course.save()
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+        if (!course.unitList.has(unitId)) {
+            course.unitList.set(unitId, unit.title);
+            await course.save();
+        }
 
+        // Update the subject
         const subject = await Subject.findById(subjectId);
-        subject.courseList.set(course._id, course.title);
-        await subject.save();
+        if (!subject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
+        if (!subject.courseList.has(courseId)) {
+            subject.courseList.set(courseId, course.title);
+            await subject.save();
+        }
 
         res.status(201).json(savedTopic);
 
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-}
+};
 
 export const addUnit = async (req, res) => {
     try {
         const { subjectId, courseId } = req.params;
         const { title } = req.body;
-        const topicList = new Map();
 
+        // Create and save the new unit
         const newUnit = new Unit({
             title,
-            topicList,
+            topicList: new Map() // This is optional as the schema will initialize an empty Map by default
         });
         const savedUnit = await newUnit.save();
-        const course = await Course.findById(courseId);
-        course.unitList.set(savedUnit._id, title);
-        await course.save()
 
+        // Update the course
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+        course.unitList.set(savedUnit._id.toString(), title);
+        await course.save();
+
+        // Update the subject
         const subject = await Subject.findById(subjectId);
-        subject.courseList.set(course._id, course.title);
-        await subject.save()
+        if (!subject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
+        if (!subject.courseList.has(courseId)) {
+            subject.courseList.set(courseId, course.title);
+            await subject.save();
+        }
 
         res.status(201).json(savedUnit);
 
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-}
+};
 
 export const addOrUpdateQuiz = async (req, res) => {
     try {
         const { topicId } = req.params;
         const { quizArray } = req.body;
-        const quiz = await Quiz.findOne({ topicId : topicId })
-        if(!quiz) {
+
+        // Validate quizArray structure
+        if (!quizArray || !quizArray.mcq || !quizArray.descriptive) {
+            return res.status(400).json({ message: "Invalid quiz structure" });
+        }
+
+        let quiz = await Quiz.findOne({ topicId: topicId });
+
+        if (!quiz) {
+            // Create new quiz
             const newQuiz = new Quiz({
                 topicId,
                 quizArray,
             });
             const savedQuiz = await newQuiz.save();
-            return res.status(201).json(savedQuiz);
+            return res.status(201).json({
+                message: "New quiz created successfully",
+                quiz: savedQuiz
+            });
+        } else {
+            // Update existing quiz
+            quiz.quizArray = quizArray;
+            await quiz.save();
+            return res.status(200).json({
+                message: "Quiz updated successfully",
+                quiz: quiz
+            });
         }
-        quiz.quizArray = quizArray;
-        await quiz.save();
-        res.status(201).json(quiz);
 
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        console.error("Error in addOrUpdateQuiz:", err);
+        res.status(500).json({ message: "An error occurred while processing the quiz" });
     }
-}
+};
 
 export const addCourse = async (req, res) => {
     try {
         const { subjectId } = req.params;
         const { title } = req.body;
-        const unitList = new Map();
+
+        // Create and save the new course
         const newCourse = new Course({
             title,
-            unitList,
+            unitList: new Map() // This is optional as the schema will initialize an empty Map by default
         });
         const savedCourse = await newCourse.save();
+
+        // Update the subject
         const subject = await Subject.findById(subjectId);
-        subject.courseList.set(savedCourse._id, title);
-        await subject.save()
+        if (!subject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
+        subject.courseList.set(savedCourse._id.toString(), title);
+        await subject.save();
+
         res.status(201).json(savedCourse);
 
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-}
+};
 
 export const addSubject = async (req, res) => {
     try {
         const { title } = req.body;
-        const courseList = new Map();
+
+        if (!title) {
+            return res.status(400).json({ message: "Title is required" });
+        }
+
         const newSubject = new Subject({
             title,
-            courseList,
+            courseList: new Map() // This is optional as the schema will initialize an empty Map by default
         });
+
         const savedSubject = await newSubject.save();
         res.status(201).json(savedSubject);
 
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
-}
+};
 
 
-export const delTopic = async (req, res) => {
+export const deleteTopic = async (req, res) => {
     try {
         const { subjectId, courseId, unitId, topicId } = req.params;
         
         // Delete the topic
-        await Topic.findByIdAndDelete(topicId);
+        const deletedTopic = await Topic.findByIdAndDelete(topicId);
         
-        const quiz = await Quiz.findOne({topicId : topicId})
-        if(quiz) {
-            await Quiz.findByIdAndDelete(quiz._id);
+        if (!deletedTopic) {
+            return res.status(404).json({ message: "Topic not found" });
         }
+
+        // Delete all associated quizzes
+        await Quiz.deleteMany({ topicId: topicId });
+
         // Find the unit and remove the topic from the topicList map
         const unit = await Unit.findById(unitId);
+        
+        if (!unit) {
+            return res.status(404).json({ message: "Unit not found" });
+        }
+
         if (unit.topicList.has(topicId)) {
             unit.topicList.delete(topicId);
             await unit.save();
-            res.status(201).json("Deletion successful");
+            return res.status(200).json({ message: "Topic and associated quizzes deleted successfully" });
         } else {
-            res.status(404).json({ message: "Topic not found in the unit" });
+            return res.status(404).json({ message: "Topic not found in the unit" });
         }
 
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
 
-export const delUnit = async (req, res) => {
+export const deleteUnit = async (req, res) => {
     try {
         const { subjectId, courseId, unitId } = req.params;
         
         // Find the unit
         const unit = await Unit.findById(unitId);
         
-        // Delete topics associated with the unit
-        for (const [topicId, topic] of unit.topicList.entries()) {
+        if (!unit) {
+            return res.status(404).json({ message: "Unit not found" });
+        }
+
+        // Delete topics and associated quizzes
+        for (const topicId of unit.topicList.keys()) {
             await Topic.findByIdAndDelete(topicId);
+            await Quiz.deleteMany({ topicId: topicId });
         }
         
         // Delete the unit itself
@@ -284,34 +341,47 @@ export const delUnit = async (req, res) => {
         
         // Update the course to remove the unit
         const course = await Course.findById(courseId);
+        
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
         if (course.unitList.has(unitId)) {
             course.unitList.delete(unitId);
             await course.save();
-            res.status(201).json("Deletion successful");
+            return res.status(200).json({ message: "Unit and associated topics deleted successfully" });
         } else {
-            res.status(404).json({ message: "Unit not found in the course" });
+            return res.status(404).json({ message: "Unit not found in the course" });
         }
 
     } catch(err) {
-        res.status(400).json({ message: err.message });
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
 
-export const delCourse = async (req, res) => {
+export const deleteCourse = async (req, res) => {
     try {
         const { subjectId, courseId } = req.params;
         
         // Find the course
         const course = await Course.findById(courseId);
         
+        if (!course) {
+            return res.status(404).json({ message: "Course not found" });
+        }
+
         // Iterate over unitList
-        for (const [unitId, unitTitle] of course.unitList.entries()) {
+        for (const unitId of course.unitList.keys()) {
             const unit = await Unit.findById(unitId);
             
-            // Iterate over topicList
-            for (const [topicId, topicTitle] of unit.topicList.entries()) {
-                await Topic.findByIdAndDelete(topicId);
+            if (unit) {
+                // Iterate over topicList
+                for (const topicId of unit.topicList.keys()) {
+                    await Topic.findByIdAndDelete(topicId);
+                    await Quiz.deleteMany({ topicId: topicId });
+                }
             }
             
             // Delete the unit
@@ -323,42 +393,57 @@ export const delCourse = async (req, res) => {
         
         // Remove courseId from subject.courseList
         const subject = await Subject.findById(subjectId);
+        
+        if (!subject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
+
         if (subject.courseList.has(courseId)) {
             subject.courseList.delete(courseId);
             await subject.save();
-            res.status(201).json("Deletion successful");
+            return res.status(200).json({ message: "Course and all associated units and topics deleted successfully" });
         } else {
-            res.status(404).json({ message: "Course not found in the subject" });
+            return res.status(404).json({ message: "Course not found in the subject" });
         }
 
     } catch(err) {
-        res.status(400).json({ message: err.message });
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
 
-export const delSubject = async (req, res) => {
+export const deleteSubject = async (req, res) => {
     try {
         const { subjectId } = req.params;
         
         // Find the subject
         const subject = await Subject.findById(subjectId);
 
+        if (!subject) {
+            return res.status(404).json({ message: "Subject not found" });
+        }
+
         // Iterate over courses in the subject
-        for (const [courseId, courseTitle] of subject.courseList.entries()) {
+        for (const courseId of subject.courseList.keys()) {
             const course = await Course.findById(courseId);
 
-            // Iterate over units in the course
-            for (const [unitId, unitTitle] of course.unitList.entries()) {
-                const unit = await Unit.findById(unitId);
+            if (course) {
+                // Iterate over units in the course
+                for (const unitId of course.unitList.keys()) {
+                    const unit = await Unit.findById(unitId);
 
-                // Iterate over topics in the unit
-                for (const [topicId, topicTitle] of unit.topicList.entries()) {
-                    await Topic.findByIdAndDelete(topicId);
+                    if (unit) {
+                        // Iterate over topics in the unit
+                        for (const topicId of unit.topicList.keys()) {
+                            await Topic.findByIdAndDelete(topicId);
+                            await Quiz.deleteMany({ topicId: topicId });
+                        }
+                    }
+
+                    // Delete the unit
+                    await Unit.findByIdAndDelete(unitId);
                 }
-
-                // Delete the unit
-                await Unit.findByIdAndDelete(unitId);
             }
 
             // Delete the course
@@ -368,44 +453,41 @@ export const delSubject = async (req, res) => {
         // Delete the subject
         await Subject.findByIdAndDelete(subjectId);
 
-        res.status(201).json("Deletion successful");
+        return res.status(200).json({ message: "Subject and all associated courses, units, topics, and quizzes deleted successfully" });
     } catch(err) {
-        res.status(400).json({ message: err.message });
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
 
-export const verifyQuiz = async(req,res) => {
-    try {
-        const { quizId  } = req.params;
-        const quiz = await Quiz.findById(quizId);
-        const { response } = req.body; // Assuming it is an array
-        const totalQuestions = Math.min(quiz.quizArray.length,response.length);
-        let score = 0;
-        for (let i = 0; i < totalQuestions; i++) {
-            if(response[i] === quiz.quizArray[i].correct) {
-                score += 1;
-            }
-        }
-        if(totalQuestions !== 0) {
-            score = (score /totalQuestions)*100;
-        }
-        res.status(200).json(score);
-
-    } catch(err) {
-        res.status(400).json({ message: err.message });
-
-    }
-}
-
-export const getQuiz = async(req,res) => {
+export const getQuiz = async (req, res) => {
     try {
         const { topicId } = req.params;
-        const quiz = await Quiz.findOne({topicId : topicId});
-        res.json(201).json(quiz);
+        const quiz = await Quiz.findOne({ topicId: topicId });
 
-    } catch(err) {
-        res.status(400).json({ message: err.message });
+        if (!quiz) {
+            return res.status(404).json({ message: "Quiz not found" });
+        }
 
+        // Create a deep copy of the quiz object
+        const quizCopy = JSON.parse(JSON.stringify(quiz));
+
+        // Remove correct answers from MCQ questions
+        quizCopy.quizArray.mcq = quizCopy.quizArray.mcq.map(question => {
+            const { correct, ...rest } = question;
+            return rest;
+        });
+
+        // Remove answers from descriptive questions
+        quizCopy.quizArray.descriptive = quizCopy.quizArray.descriptive.map(question => {
+            const { answer, ...rest } = question;
+            return rest;
+        });
+
+        res.status(200).json(quizCopy);
+    } catch (err) {
+        console.error("Error in getQuiz:", err);
+        res.status(500).json({ message: "An error occurred while fetching the quiz" });
     }
-}
+};
