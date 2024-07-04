@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setLogin } from '../../state/authSlice';
+import { message } from 'antd';
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const Login = () => {
       console.error('Registration failed', error.message);
     }
     if (res.status === 200) {
+      message.success("Login Successfully");
       const data = await res.json()
       const token = data.token
       dispatch(setLogin(data));
@@ -40,7 +42,7 @@ const Login = () => {
   return (
     <div className="##243c5a min-h-screen flex items-center justify-center">
       <div className="#061d3c p-8 rounded-lg shadow-2xl w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-8 text-black">LOGIN</h2>
+        <h2 className="text-2xl font-bold mb-8 text-black">Login</h2>
         <form onSubmit={handleSubmit} className="max-w-md mx-auto">
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-600">

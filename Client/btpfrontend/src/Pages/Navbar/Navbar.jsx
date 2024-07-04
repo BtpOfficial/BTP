@@ -5,6 +5,7 @@ import Logo from "../../assets/logo.jpg"
 import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
 import { Link, useNavigate } from "react-router-dom";
+import { message } from 'antd';
 //{localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/Profile"} onClick={makeActiveSignUp}>MyProfile</Link>  </p>}
 const Navbar = () => {
     const navigate = useNavigate();
@@ -31,7 +32,8 @@ const Navbar = () => {
         sethide(!hide);
     }
     const logoutfunc = () => {
-        window.location.reload();
+        message.success("Logout Successfully");
+        makeActiveHome();
         localStorage.clear();
         navigate('/');
     }
