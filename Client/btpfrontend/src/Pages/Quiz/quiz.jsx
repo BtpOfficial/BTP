@@ -49,7 +49,7 @@ const Quiz = () => {
             const res = await fetch(`http://localhost:3001/users/${topicId}/${quizId}/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ response: { user_id, selectedOptions, descriptiveAnswers } })
+                body: JSON.stringify({ user_id, selectedOptions, descriptiveAnswers })
             });
             if (res.status === 200) {
                 const data = await res.json();

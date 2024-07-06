@@ -57,8 +57,8 @@ export const markComplete = async (req, res) => {
 export const verifyQuiz = async (req, res) => {
     try {
         const { topicId, quizId } = req.params;
-        const { userId, user_response_mcq, user_response_descriptive } = req.body;
-
+        const { user_id: userId, selectedOptions: user_response_mcq, descriptiveAnswers: user_response_descriptive } = req.body
+        console.log(userId, user_response_mcq, user_response_descriptive);
         const user = await User.findById(userId);
         const quiz = await Quiz.findById(quizId);
 
