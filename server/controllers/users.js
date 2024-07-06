@@ -76,7 +76,10 @@ export const verifyQuiz = async (req, res) => {
             }
         }
 
-        // this socre should also inculde some api callss
+        // this socre should also inculde some api callss ---------------------- raghav part llm
+        // sentenc similary code here -- score variabe add / subtract -- api --
+
+        // -- 
 
         // Calculate score as a percentage
         const totalQuestions = actual_mcq.length + actual_descriptive.length;
