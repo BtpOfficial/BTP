@@ -10,10 +10,10 @@ export const markComplete = async (req, res) => {
         const { subjectId, courseId, unitId, topicId } = req.params;
         const { userId } = req.body;
         const user = await User.findById(userId);
-        
+
         let progress = user.progress || [];
         let subjectIndex = progress.findIndex(item => item.subjectId === subjectId);
-        
+
         if (subjectIndex === -1) {
             progress.push({
                 subjectId,
@@ -21,9 +21,9 @@ export const markComplete = async (req, res) => {
             });
             subjectIndex = progress.length - 1;
         }
-        
+
         let courseIndex = progress[subjectIndex].courseList.findIndex(item => item.courseId === courseId);
-        
+
         if (courseIndex === -1) {
             progress[subjectIndex].courseList.push({
                 courseId,
@@ -31,9 +31,9 @@ export const markComplete = async (req, res) => {
             });
             courseIndex = progress[subjectIndex].courseList.length - 1;
         }
-        
+
         let unitIndex = progress[subjectIndex].courseList[courseIndex].unitList.findIndex(item => item.unitId === unitId);
-        
+
         if (unitIndex === -1) {
             progress[subjectIndex].courseList[courseIndex].unitList.push({
                 unitId,
@@ -41,11 +41,11 @@ export const markComplete = async (req, res) => {
             });
             unitIndex = progress[subjectIndex].courseList[courseIndex].unitList.length - 1;
         }
-        
+
         if (!progress[subjectIndex].courseList[courseIndex].unitList[unitIndex].topicList.includes(topicId)) {
             progress[subjectIndex].courseList[courseIndex].unitList[unitIndex].topicList.push(topicId);
         }
-        
+
         user.progress = progress;
         const updatedUser = await user.save();
         res.status(201).json(updatedUser);
@@ -289,10 +289,10 @@ export const addSubject = async (req, res) => {
 export const deleteTopic = async (req, res) => {
     try {
         const { subjectId, courseId, unitId, topicId } = req.params;
-        
+
         // Delete the topic
         const deletedTopic = await Topic.findByIdAndDelete(topicId);
-        
+
         if (!deletedTopic) {
             return res.status(404).json({ message: "Topic not found" });
         }
@@ -302,7 +302,7 @@ export const deleteTopic = async (req, res) => {
 
         // Find the unit and remove the topic from the topicList map
         const unit = await Unit.findById(unitId);
-        
+
         if (!unit) {
             return res.status(404).json({ message: "Unit not found" });
         }
@@ -325,10 +325,10 @@ export const deleteTopic = async (req, res) => {
 export const deleteUnit = async (req, res) => {
     try {
         const { subjectId, courseId, unitId } = req.params;
-        
+
         // Find the unit
         const unit = await Unit.findById(unitId);
-        
+
         if (!unit) {
             return res.status(404).json({ message: "Unit not found" });
         }
@@ -338,13 +338,13 @@ export const deleteUnit = async (req, res) => {
             await Topic.findByIdAndDelete(topicId);
             await Quiz.deleteMany({ topicId: topicId });
         }
-        
+
         // Delete the unit itself
         await Unit.findByIdAndDelete(unitId);
-        
+
         // Update the course to remove the unit
         const course = await Course.findById(courseId);
-        
+
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
@@ -357,7 +357,7 @@ export const deleteUnit = async (req, res) => {
             return res.status(404).json({ message: "Unit not found in the course" });
         }
 
-    } catch(err) {
+    } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -367,10 +367,10 @@ export const deleteUnit = async (req, res) => {
 export const deleteCourse = async (req, res) => {
     try {
         const { subjectId, courseId } = req.params;
-        
+
         // Find the course
         const course = await Course.findById(courseId);
-        
+
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
@@ -378,7 +378,7 @@ export const deleteCourse = async (req, res) => {
         // Iterate over unitList
         for (const unitId of course.unitList.keys()) {
             const unit = await Unit.findById(unitId);
-            
+
             if (unit) {
                 // Iterate over topicList
                 for (const topicId of unit.topicList.keys()) {
@@ -386,17 +386,17 @@ export const deleteCourse = async (req, res) => {
                     await Quiz.deleteMany({ topicId: topicId });
                 }
             }
-            
+
             // Delete the unit
             await Unit.findByIdAndDelete(unitId);
         }
 
         // Delete the course itself
         await Course.findByIdAndDelete(courseId);
-        
+
         // Remove courseId from subject.courseList
         const subject = await Subject.findById(subjectId);
-        
+
         if (!subject) {
             return res.status(404).json({ message: "Subject not found" });
         }
@@ -409,7 +409,7 @@ export const deleteCourse = async (req, res) => {
             return res.status(404).json({ message: "Course not found in the subject" });
         }
 
-    } catch(err) {
+    } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Internal server error" });
     }
@@ -419,7 +419,7 @@ export const deleteCourse = async (req, res) => {
 export const deleteSubject = async (req, res) => {
     try {
         const { subjectId } = req.params;
-        
+
         // Find the subject
         const subject = await Subject.findById(subjectId);
 
@@ -457,7 +457,7 @@ export const deleteSubject = async (req, res) => {
         await Subject.findByIdAndDelete(subjectId);
 
         return res.status(200).json({ message: "Subject and all associated courses, units, topics, and quizzes deleted successfully" });
-    } catch(err) {
+    } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Internal server error" });
     }
