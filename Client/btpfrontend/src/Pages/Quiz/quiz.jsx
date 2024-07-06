@@ -34,8 +34,8 @@ const Quiz = () => {
             console.error('Data not found', error.message);
         }
     };
-    const user_id = useSelector((state) => state.id)
-
+    const user_id = useSelector((state) => state.user?._id)
+    console.log(user_id)
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasNullOption = selectedOptions.some(option => option === null);

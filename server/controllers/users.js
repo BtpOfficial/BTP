@@ -4,7 +4,7 @@ import Subject from "../models/Subject.js";
 import Topic from "../models/Topic.js";
 import Unit from "../models/Unit.js";
 import User from "../models/User.js";
-
+import axios from 'axios';
 export const markComplete = async (req, res) => {
     try {
         const { subjectId, courseId, unitId, topicId } = req.params;
@@ -54,18 +54,109 @@ export const markComplete = async (req, res) => {
     }
 };
 // need to change
+// export const verifyQuiz = async (req, res) => {
+//     console.log(req.body)
+//     try {
+//         const { topicId, quizId } = req.params;
+//         const { user_id: userId, selectedOptions: user_response_mcq, descriptiveAnswers: user_response_descriptive } = req.body
+//         console.log(userId, user_response_mcq, user_response_descriptive);
+//         const user = await User.findById(userId);
+//         const quiz = await Quiz.findById(quizId);
+//         console.log(user , quiz)
+
+//         if (!user || !quiz) {
+//             return res.status(404).json({ message: "User or Quiz not found" });
+//         }
+//         const actual_mcq = quiz.quizArray.mcq.map(question => question.correct);
+//         const actual_descriptive = quiz.quizArray.descriptive.map(question => question.answer);
+
+//         let score = 0;
+//         for (let i = 0; i < user_response_mcq.length; i++) {
+//             if (user_response_mcq[i] === actual_mcq[i]) {
+//                 score += 1;
+//             }
+//         }
+//         console.log(actual_descriptive);
+
+//             const data = [];
+
+//             for (let i = 0; i < actual_descriptive.length; i++) {
+//                 data.push({
+//                     "source_sentence": actual_descriptive[i],
+//                     "user_sentences": user_response_descriptive[i]
+//                 });
+//             }
+
+//             console.log(data);
+//             try {
+//                 const response = await axios.post('http://localhost:5000/receive_data', data, {
+//                     headers: {
+//                         'Content-Type': 'application/json'
+//                     }
+//                 });
+//                 const score_data = response.data;  // Store the response data in a variable
+//                 console.log(score_data);  // Log the response data for debugging purposes
+//                 res.json(score_data);  // Send the response data back to the client
+//             } catch (error) {
+//                 console.error('Error sending data to Flask:', error.message);
+//                 res.status(500).json({ error: error.message });  // Ensure to handle errors with a single response
+//             }
+            
+//         // this socre should also inculde some api callss ---------------------- raghav part llm
+//         // sentenc similary code here -- score variabe add / subtract -- api --
+
+//         // -- 
+
+//         // Calculate score as a percentage
+//         const totalQuestions = actual_mcq.length + actual_descriptive.length;
+//         const scorePercentage = Math.round((score / totalQuestions) * 100);
+
+//         // Find or create the progress entry for this topic
+//         let topicProgress = user.progress_on_quiz.find(p => p.topicId === topicId);
+//         if (!topicProgress) {
+//             topicProgress = { topicId, value: [] };
+//             user.progress_on_quiz.push(topicProgress);
+//         }
+
+//         // Find or create the quiz entry for this quiz
+//         topicProgress = user.progress_on_quiz.find(p => p.topicId === topicId);
+//         let quizProgress = topicProgress.value.find(q => q.quizId === quizId);
+//         if (!quizProgress) {
+//             quizProgress = { quizId, score: scorePercentage };
+//             topicProgress.value.push(quizProgress);
+//         } else {
+//             quizProgress.score = scorePercentage;
+//         }
+//         quizProgress = topicProgress.value.find(q => q.quizId === quizId);
+//         // Ensure the score is within the allowed range
+//         quizProgress.score = Math.max(-20, Math.min(100, quizProgress.score));
+
+//         await user.save();
+
+//         res.status(200).json({
+//             message: "Quiz evaluated successfully",
+//             score: scorePercentage,
+//             user: user
+//         });
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// };
 export const verifyQuiz = async (req, res) => {
+    console.log(req.body);
     try {
         const { topicId, quizId } = req.params;
-        const { user_id: userId, selectedOptions: user_response_mcq, descriptiveAnswers: user_response_descriptive } = req.body
+        const { user_id: userId, selectedOptions: user_response_mcq, descriptiveAnswers: user_response_descriptive } = req.body;
         console.log(userId, user_response_mcq, user_response_descriptive);
+
         const user = await User.findById(userId);
         const quiz = await Quiz.findById(quizId);
-
+        console.log(user, quiz);
 
         if (!user || !quiz) {
             return res.status(404).json({ message: "User or Quiz not found" });
         }
+
         const actual_mcq = quiz.quizArray.mcq.map(question => question.correct);
         const actual_descriptive = quiz.quizArray.descriptive.map(question => question.answer);
 
@@ -75,11 +166,37 @@ export const verifyQuiz = async (req, res) => {
                 score += 1;
             }
         }
+        console.log(actual_descriptive);
 
-        // this socre should also inculde some api callss ---------------------- raghav part llm
-        // sentenc similary code here -- score variabe add / subtract -- api --
+        const data = [];
 
-        // -- 
+        for (let i = 0; i < actual_descriptive.length; i++) {
+            data.push({
+                "source_sentence": actual_descriptive[i],
+                "user_sentences": user_response_descriptive[i]
+            });
+        }
+
+        console.log(data);
+        
+        let score_data;
+        try {
+            const response = await axios.post('http://localhost:5000/receive_data', data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            score_data = response.data;  // Store the response data in a variable
+            console.log(score_data);  // Log the response data for debugging purposes
+        } catch (error) {
+            console.error('Error sending data to Flask:', error.message);
+            return res.status(500).json({ error: error.message });  // Ensure to handle errors with a single response
+        }
+
+        // Incorporate the score from the Flask service
+        if (score_data && score_data.additional_score) {
+            score += score_data.additional_score;
+        }
 
         // Calculate score as a percentage
         const totalQuestions = actual_mcq.length + actual_descriptive.length;
@@ -93,7 +210,6 @@ export const verifyQuiz = async (req, res) => {
         }
 
         // Find or create the quiz entry for this quiz
-        topicProgress = user.progress_on_quiz.find(p => p.topicId === topicId);
         let quizProgress = topicProgress.value.find(q => q.quizId === quizId);
         if (!quizProgress) {
             quizProgress = { quizId, score: scorePercentage };
@@ -101,7 +217,7 @@ export const verifyQuiz = async (req, res) => {
         } else {
             quizProgress.score = scorePercentage;
         }
-        quizProgress = topicProgress.value.find(q => q.quizId === quizId);
+
         // Ensure the score is within the allowed range
         quizProgress.score = Math.max(-20, Math.min(100, quizProgress.score));
 
