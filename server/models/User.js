@@ -48,16 +48,11 @@ const UserSchema = new mongoose.Schema(
     progress_on_quiz: [
       {
         topicId: String,
-        value: [
-          {
-            quizId: String,
-            score: {
-              type: Number,
-              min: -20,
-              max: 100
-            },
-          }
-        ]
+        quiz:  {
+          quizId: String,
+          mcqScores: [Number],
+          descriptiveScores: [Number],
+        }
       }
     ]
   },

@@ -101,7 +101,7 @@ export const markComplete = async (req, res) => {
 //                 console.error('Error sending data to Flask:', error.message);
 //                 res.status(500).json({ error: error.message });  // Ensure to handle errors with a single response
 //             }
-            
+
 //         // this socre should also inculde some api callss ---------------------- raghav part llm
 //         // sentenc similary code here -- score variabe add / subtract -- api --
 
@@ -143,15 +143,12 @@ export const markComplete = async (req, res) => {
 //     }
 // };
 export const verifyQuiz = async (req, res) => {
-    console.log(req.body);
     try {
         const { topicId, quizId } = req.params;
         const { user_id: userId, selectedOptions: user_response_mcq, descriptiveAnswers: user_response_descriptive } = req.body;
-        console.log(userId, user_response_mcq, user_response_descriptive);
 
         const user = await User.findById(userId);
         const quiz = await Quiz.findById(quizId);
-        console.log(user, quiz);
 
         if (!user || !quiz) {
             return res.status(404).json({ message: "User or Quiz not found" });
@@ -160,14 +157,23 @@ export const verifyQuiz = async (req, res) => {
         const actual_mcq = quiz.quizArray.mcq.map(question => question.correct);
         const actual_descriptive = quiz.quizArray.descriptive.map(question => question.answer);
 
+        const mcqScores = [];
+        const descriptiveScores = [];
+        const answer = [];
         let score = 0;
+
         for (let i = 0; i < user_response_mcq.length; i++) {
             if (user_response_mcq[i] === actual_mcq[i]) {
+                mcqScores.push(1);
                 score += 1;
+            } else {
+                mcqScores.push(0);
             }
+            answer.push({
+                "your_answer" : user_response_mcq[i],
+                "right_answer" : actual_mcq[i]
+            })
         }
-        console.log(actual_descriptive);
-
         const data = [];
 
         for (let i = 0; i < actual_descriptive.length; i++) {
@@ -177,8 +183,6 @@ export const verifyQuiz = async (req, res) => {
             });
         }
 
-        console.log(data);
-        
         let score_data;
         try {
             const response = await axios.post('http://localhost:5000/receive_data', data, {
@@ -194,39 +198,52 @@ export const verifyQuiz = async (req, res) => {
         }
 
         // Incorporate the score from the Flask service
-        if (score_data && score_data.additional_score) {
-            score += score_data.additional_score;
+
+        for (let value of score_data.results) {
+            if (parseFloat(value.accuracy) > 70) {
+                descriptiveScores.push(1);
+                score += 1;
+            } else {
+                descriptiveScores.push(0);
+            }
         }
+
+        const answer1 = score_data.results;
 
         // Calculate score as a percentage
         const totalQuestions = actual_mcq.length + actual_descriptive.length;
         const scorePercentage = Math.round((score / totalQuestions) * 100);
 
-        // Find or create the progress entry for this topic
         let topicProgress = user.progress_on_quiz.find(p => p.topicId === topicId);
         if (!topicProgress) {
-            topicProgress = { topicId, value: [] };
+            topicProgress = { topicId, quiz: {} };
             user.progress_on_quiz.push(topicProgress);
         }
+        
+        topicProgress = user.progress_on_quiz.find(p => p.topicId === topicId);
 
         // Find or create the quiz entry for this quiz
-        let quizProgress = topicProgress.value.find(q => q.quizId === quizId);
+        let quizProgress = topicProgress.quiz;
         if (!quizProgress) {
-            quizProgress = { quizId, score: scorePercentage };
-            topicProgress.value.push(quizProgress);
+            quizProgress = {
+                quizId,
+                mcqScores,
+                descriptiveScores,
+            };
+            topicProgress.quiz.push(quizProgress);
         } else {
-            quizProgress.score = scorePercentage;
+            quizProgress.mcqScores = mcqScores;
+            quizProgress.descriptiveScores = descriptiveScores;
         }
 
-        // Ensure the score is within the allowed range
-        quizProgress.score = Math.max(-20, Math.min(100, quizProgress.score));
+        quizProgress = topicProgress.quiz;
 
         await user.save();
 
         res.status(200).json({
             message: "Quiz evaluated successfully",
-            score: scorePercentage,
-            user: user
+            answer,
+            answer1,
         });
     } catch (err) {
         res.status(500).json({ message: err.message });
