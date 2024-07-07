@@ -28,26 +28,35 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["Male", "Female", "Other"]
     },
-    progress: {
-      type: [
-        {
-          subjectId: String,
-          courseList: [
-            {
-              courseId: String,
-              unitList: [
-                {
-                  unitId: String,
-                  topicList: [String],
-                }
-              ],
-            }
-          ],
+    progress: [
+      {
+        subjectId: String,
+        courseList: [
+          {
+            courseId: String,
+            unitList: [
+              {
+                unitId: String,
+                topicList: [String],
+              }
+            ],
+          }
+        ],
+      }
+    ],
+
+    progress_on_quiz: [
+      {
+        topicId: String,
+        quiz:  {
+          quizId: String,
+          mcqScores: [Number],
+          descriptiveScores: [Number],
         }
-      ],
-      default: [],
-    },
+      }
+    ]
   },
+
   { timestamps: true }
 );
 
