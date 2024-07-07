@@ -4,6 +4,8 @@ import Styles from "./quiz.module.css";
 import { message } from 'antd';
 import { BarLoader } from 'react-spinners';
 import { useSelector } from "react-redux";
+import { answers, answers1 } from "./data";
+
 const Quiz = () => {
     const [loading, setLoading] = useState(false);
     const { topicId } = useParams();
@@ -12,6 +14,8 @@ const Quiz = () => {
     const [response, setResponse] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [descriptiveAnswers, setDescriptiveAnswers] = useState([]);
+    const [mcqAnswers, setMcqAnswers] = useState(answers);
+    const [descAnswers, setDescAnswers] = useState(answers1);
     const navigate = useNavigate();
 
     const getQuiz = async () => {
@@ -22,7 +26,7 @@ const Quiz = () => {
             });
             if (res.status === 404) {
                 message.error('Quiz not found');
-                navigate(-1)
+                navigate(-1);
                 return;
             }
             const fetchedData = await res.json();
@@ -34,8 +38,14 @@ const Quiz = () => {
             console.error('Data not found', error.message);
         }
     };
+<<<<<<< Updated upstream
     const user_id = useSelector((state) => state.user?._id)
     console.log(user_id)
+=======
+
+    const user_id = useSelector((state) => state.user?._id);
+
+>>>>>>> Stashed changes
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasNullOption = selectedOptions.some(option => option === null);
@@ -74,6 +84,7 @@ const Quiz = () => {
         newSelectedOptions[questionIndex] = optionValue;
         setSelectedOptions(newSelectedOptions);
     };
+
     const handleDescriptiveChange = (questionIndex, value) => {
         const newDescriptiveAnswers = [...descriptiveAnswers];
         newDescriptiveAnswers[questionIndex] = value;
@@ -91,7 +102,6 @@ const Quiz = () => {
                     <BarLoader />
                 </div>
             ) : (
-
                 <div className={Styles.container}>
                     <div className={Styles.score}>
                         {response && <p>You Scored - {response}%</p>}
@@ -114,6 +124,10 @@ const Quiz = () => {
                                     </li>
                                 ))}
                             </ul>
+                            <div>
+                                <p>Your Answer:  <strong>{mcqAnswers[index]?.your_answer}</strong></p>
+                                <p>Correct Answer: <strong>{mcqAnswers[index]?.right_answer}</strong></p>
+                            </div>
                         </div>
                     ))}
 
@@ -126,6 +140,11 @@ const Quiz = () => {
                                 onChange={(e) => handleDescriptiveChange(index, e.target.value)}
                                 className={Styles.textarea}
                             />
+                            <div>
+                                <p>Your Answer:  <strong>{descAnswers[index]?.your_answer}</strong></p>
+                                <p>Correct Answer: <strong>{descAnswers[index]?.right_answer}</strong></p>
+                                <p>Accuracy: <strong>{descAnswers[index]?.accuracy}</strong></p>
+                            </div>
                         </div>
                     ))}
                     <div className={Styles.cont_button_div}>
