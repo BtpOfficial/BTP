@@ -42,19 +42,19 @@ export const getUnitList = async (req, res) => {
     }
 };
 
-export const getQuizList = async (req, res) => {
-    try {
-        const { subjectId, courseId } = req.params;
-        const course = await Course.findById(courseId);
-        const quizListIds = course.quizList;
-        const quizList = await Promise.all(
-            quizListIds.map((id) => Quiz.findById(id))
-        )
-        res.status(200).json(quizList);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-};
+// export const getQuizList = async (req, res) => {
+//     try {
+//         const { subjectId, courseId } = req.params;
+//         const course = await Course.findById(courseId);
+//         const quizListIds = course.quizList;
+//         const quizList = await Promise.all(
+//             quizListIds.map((id) => Quiz.findById(id))
+//         )
+//         res.status(200).json(quizList);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// };
 
 export const getTopicList = async (req, res) => {
     try {
