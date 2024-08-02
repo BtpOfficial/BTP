@@ -4,6 +4,7 @@ import Styles from "./quiz.module.css";
 import { message } from 'antd';
 import { BarLoader } from 'react-spinners';
 import { useSelector } from "react-redux";
+
 const Quiz = () => {
     const [loading, setLoading] = useState(false);
     const { topicId } = useParams();
@@ -12,6 +13,8 @@ const Quiz = () => {
     const [response, setResponse] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [descriptiveAnswers, setDescriptiveAnswers] = useState([]);
+    const [mcqAnswers, setMcqAnswers] = useState([]);
+    const [descAnswers, setDescAnswers] = useState([]);
     const navigate = useNavigate();
 
     const getQuiz = async () => {
@@ -22,7 +25,7 @@ const Quiz = () => {
             });
             if (res.status === 404) {
                 message.error('Quiz not found');
-                navigate(-1)
+                navigate(-1);
                 return;
             }
             const fetchedData = await res.json();
@@ -34,8 +37,9 @@ const Quiz = () => {
             console.error('Data not found', error.message);
         }
     };
-    const user_id = useSelector((state) => state.user?._id)
-    console.log(user_id)
+
+    const user_id = useSelector((state) => state.user?._id);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const hasNullOption = selectedOptions.some(option => option === null);
@@ -51,13 +55,15 @@ const Quiz = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id, selectedOptions, descriptiveAnswers })
             });
+            const fetchedData = await res.json();
+            setMcqAnswers(fetchedData.answer)
+            setDescAnswers(fetchedData.answer1)
             if (res.status === 200) {
-                const data = await res.json();
-                setResponse(data);
                 window.scrollTo({
                     top: 0,
                     behavior: "smooth"
                 });
+                message.success(fetchedData.message);
             } else {
                 message.error('Some error occurred');
             }
@@ -74,13 +80,19 @@ const Quiz = () => {
         newSelectedOptions[questionIndex] = optionValue;
         setSelectedOptions(newSelectedOptions);
     };
+
     const handleDescriptiveChange = (questionIndex, value) => {
         const newDescriptiveAnswers = [...descriptiveAnswers];
         newDescriptiveAnswers[questionIndex] = value;
         setDescriptiveAnswers(newDescriptiveAnswers);
     };
-
+    const data = useSelector((state) => state.user);
     useEffect(() => {
+        if (!data) {
+            navigate(-1);
+            message.error("login first")
+            return;
+        }
         getQuiz();
     }, []);
 
@@ -91,7 +103,6 @@ const Quiz = () => {
                     <BarLoader />
                 </div>
             ) : (
-
                 <div className={Styles.container}>
                     <div className={Styles.score}>
                         {response && <p>You Scored - {response}%</p>}
@@ -114,6 +125,12 @@ const Quiz = () => {
                                     </li>
                                 ))}
                             </ul>
+                            {mcqAnswers.length > 0 &&
+                                <div>
+                                    <p>Your Answer:  <strong>{mcqAnswers[index]?.your_answer}</strong></p>
+                                    <p>Correct Answer: <strong>{mcqAnswers[index]?.right_answer}</strong></p>
+                                </div>
+                            }
                         </div>
                     ))}
 
@@ -125,7 +142,12 @@ const Quiz = () => {
                                 value={descriptiveAnswers[index]}
                                 onChange={(e) => handleDescriptiveChange(index, e.target.value)}
                                 className={Styles.textarea}
-                            />
+                            />{mcqAnswers.length > 0 &&
+                                <div>
+                                    <p>Your Answer:  <strong>{descAnswers[index]?.right_answer}</strong></p>
+                                    <p> Correct Answer:<strong>{descAnswers[index]?.your_answer}</strong></p>
+                                    <p>Accuracy: <strong>{descAnswers[index]?.accuracy}</strong></p>
+                                </div>}
                         </div>
                     ))}
                     <div className={Styles.cont_button_div}>

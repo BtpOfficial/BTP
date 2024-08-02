@@ -6,6 +6,8 @@ import { RxHamburgerMenu } from "react-icons/rx";
 import { RxCross1 } from "react-icons/rx";
 import { Link, useNavigate } from "react-router-dom";
 import { message } from 'antd';
+import { useDispatch } from "react-redux";
+import { setLogout } from "../../state/authSlice";
 //{localStorage.getItem("token") && <p className={`${Styles.nav_item} ${Active3 && Styles.active}`} ><Link to={"/Profile"} onClick={makeActiveSignUp}>MyProfile</Link>  </p>}
 const Navbar = () => {
     const navigate = useNavigate();
@@ -31,11 +33,14 @@ const Navbar = () => {
     const showbar = () => {
         sethide(!hide);
     }
+    const dispatch = useDispatch();
     const logoutfunc = () => {
         message.success("Logout Successfully");
         makeActiveHome();
         localStorage.clear();
+        dispatch(setLogout())
         navigate('/');
+
     }
     return (<>
         <div className={Styles.main}>
