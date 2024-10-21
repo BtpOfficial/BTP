@@ -5,7 +5,7 @@ import time
 app = Flask(__name__)
 
 API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/msmarco-distilbert-base-tas-b"
-api_token = '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'
+api_token = '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'
 headers = {"Authorization": f"Bearer {api_token}"}
 
 def query(payload):
