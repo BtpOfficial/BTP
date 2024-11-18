@@ -337,9 +337,9 @@ export const addOrUpdateQuiz = async (req, res) => {
             );
             // console.log("Received quizArray from Flask:", response);
             quizArray = response.data; // Extract quizArray from response data
-            console.log("ffffffffffffffffffff")
-            console.log(quizArray)
-            console.log("fffffffffff")
+            // console.log("ffffffffffffffffffff")
+            // console.log(quizArray)
+            // console.log("fffffffffff")
 
             console.log("Received quizArray from Flask:", quizArray); // Debug log
         } catch (error) {
@@ -379,6 +379,48 @@ export const addOrUpdateQuiz = async (req, res) => {
     } catch (err) {
         console.error("Error in addOrUpdateQuiz:", err);
         res.status(500).json({ message: "An error occurred while processing the quiz" });
+    }
+};
+
+
+export const assessMe = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const progress_on_quiz = user.progress_on_quiz;
+        let data; // Define `data` in the outer scope
+
+        try {
+            const response = await axios.post(
+                'http://localhost:5000/receive_for_improvement',
+                { progress_on_quiz }, // Send topic as JSON
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+
+            data = response.data; // Assign data here
+            console.log("Received data from Flask:", data); // Debug log
+
+        } catch (error) {
+            console.error('Error sending data to Flask:', error.message);
+            return res.status(500).json({ error: "Error getting data from Flask service" });
+        }
+
+        return res.status(201).json({
+            message: "Data generated successfully",
+            data: data, // Use `data` from the outer scope
+        });
+
+    } catch (err) {
+        console.error("Error in assessMe:", err);
+        res.status(500).json({ message: "An error occurred while fetching progress" });
     }
 };
 

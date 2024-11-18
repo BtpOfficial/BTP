@@ -293,6 +293,120 @@ def receive_quiz_topic():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "An error occurred while generating the quiz."}), 500
+    
+
+def gen_prompt_for_improvement(progress_on_quiz) : 
+    prompt = """I am building an educational platform where users take quizzes on various topics. Based on their quiz performance, I want to provide personalized feedback and suggest an appropriate learning path to improve their understanding.
+
+Here is a user's quiz progress::
+{{
+
+[
+  {{
+    "topicId": "id1",
+    "topicTitle": "Time Complexity",
+    "quizScore": 45
+  }},
+  {{
+    "topicId": "id2",
+    "topicTitle": "Sorting Algorithms",
+    "quizScore": 75
+  }},
+  {{
+    "topicId": "id3",
+    "topicTitle": "Recursion",
+    "quizScore": 35
+  }},
+  {{
+    "topicId": "id4",
+    "topicTitle": "Dynamic Programming",
+    "quizScore": 60
+  }}
+]
+}}
+
+Goal:
+Provide a concise, precise, and personalized learning path based on the quiz scores provided {progress_on_quiz}.
+
+Instructions:
+Identify topics where the user scored below 50 and recommend foundational concepts and beginner-level resources.
+For scores between 50 -70, suggest intermediate revision materials or practice problems.
+For scores above 70, provide advanced topics or related areas to explore.
+Ensure the feedback is concise, actionable, and tailored to the user’s needs. Avoid unnecessary details.
+Example:
+Time Complexity (45):
+Action Plan: Review basics of Big O notation and practice complexity analysis. Resource: [Beginner's Guide to Time Complexity (YouTube)].
+Sorting Algorithms (75):
+Action Plan: Explore advanced techniques like radix sort and external sorting. Resource: [LeetCode Sorting Section].
+Recursion (35):
+Action Plan: Focus on stack operations and recursion basics. Solve problems like factorial and Fibonacci sequence. Resource: [Recursion Basics (YouTube)].
+Dynamic Programming (60):
+Action Plan: Strengthen memoization and tabulation methods. Practice problems: knapsack and LCS. Resource: [GeeksforGeeks DP Section].
+
+ """
+    
+    return prompt
+
+# for evaluating quiz using LLM
+def get_model_response_improvement(prompt):
+    client = OpenAI(
+        base_url="https://api-inference.huggingface.co/v1/",
+        api_key="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"
+    )
+
+    messages = [
+        {
+            "role": "system",
+            "content": "You are an expert educational advisor for an online learning platform. Your role is to analyze users' quiz performance data and provide tailored feedback"
+        },
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
+
+    try:
+        # Call the model with streaming enabled
+        stream = client.chat.completions.create(
+            model="meta-llama/Llama-3.2-1B-Instruct",
+            messages=messages,
+            max_tokens=2000,
+            stream=True,
+            temperature=0.7
+        )
+
+        # Collect and process the streamed output
+        output = ""
+        # print("kk")
+        # print(stream)
+        # print("kk")
+        for chunk in stream:
+            delta = chunk.choices[0].delta
+            output += delta.content if delta.content else ""
+
+        return output
+
+    except Exception as e:
+        return json.dumps({"error": f"Request error: {str(e)}"})
+
+
+@app.route('/receive_for_improvement', methods=['POST'])
+def receive_for_improvement():
+    """Endpoint to receive progress_on_quiz."""
+    try:
+        progress_on_quiz = request.json.get("progress_on_quiz", "")
+        print(progress_on_quiz)
+        if not progress_on_quiz:
+            return jsonify({"error": "Progress_on_quiz is required"}), 400
+
+        # Generate the quiz
+        prompt = gen_prompt_for_improvement(progress_on_quiz)
+        response = get_model_response_improvement(prompt)
+
+        return jsonify(response), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"error": "An error occurred while processing progress."}), 500
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
