@@ -148,14 +148,13 @@ export const getSubjectHierarchy = async (req, res) => {
     try {
         // Fetch all subjects
         const subjects = await Subject.find({});
-
         // Array to store the final hierarchical data
         const hierarchicalData = [];
 
         // Process each subject
         for (const subject of subjects) {
             const subjectData = {
-                _id: subject._id,
+                subjectId : subject._id,
                 title: subject.title,
                 courses: [],
             };
@@ -166,7 +165,7 @@ export const getSubjectHierarchy = async (req, res) => {
                 const course = await Course.findById(courseId);
                 if (course) {
                     const courseData = {
-                        _id: course._id,
+                        courseId: courseId,
                         title: course.title,
                         units: [],
                     };
@@ -177,7 +176,7 @@ export const getSubjectHierarchy = async (req, res) => {
                         const unit = await Unit.findById(unitId);
                         if (unit) {
                             const unitData = {
-                                _id: unit._id,
+                                unitId: unitId,
                                 title: unit.title,
                                 topicCount: unit.topicList.size, // Include count of topics
                             };
