@@ -6,6 +6,10 @@ const QuizSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    topicTitle : {
+      type : String,
+      required : true,
+    },
     quizArray: {
       mcq: [
         {

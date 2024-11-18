@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  markComplete,
   verifyQuiz,
   addTopic,
   addUnit,
@@ -17,7 +16,6 @@ import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/:subjectId/:courseId/:unitId/:topicId/read", markComplete);
 router.post("/:topicId/:quizId/verify", verifyQuiz);
 router.post("/:subjectId/:courseId/:unitId/add", addTopic);
 router.post("/:subjectId/:courseId/add", addUnit);
