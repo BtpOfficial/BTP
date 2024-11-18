@@ -3,7 +3,7 @@ import Course from "../models/Course.js"
 import Unit from "../models/Unit.js";
 import Quiz from "../models/Quiz.js";
 import Topic from "../models/Topic.js";
-
+import User from '../models/User.js'
 export const getSubjectList = async (req, res) => {
     try {
         const subjectList = await Subject.find();
@@ -86,9 +86,10 @@ export const getUnitAverageScore = async (req, res) => {
     try {
         const { unitId } = req.params;
         const { userId } = req.body;
-
         // Validate parameters
         if (!unitId || !userId) {
+            if (!unitId) console.log("not unit")
+            if (!userId) console.log("not user")
             return res.status(400).json({
                 message: "Missing required parameters"
             });
@@ -97,16 +98,16 @@ export const getUnitAverageScore = async (req, res) => {
         // Find the user
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ 
-                message: "User not found" 
+            return res.status(404).json({
+                message: "User not found"
             });
         }
 
         // Find the unit
         const unit = await Unit.findById(unitId);
         if (!unit) {
-            return res.status(404).json({ 
-                message: "Unit not found" 
+            return res.status(404).json({
+                message: "Unit not found"
             });
         }
 
@@ -114,7 +115,7 @@ export const getUnitAverageScore = async (req, res) => {
         const unitTopicIds = Array.from(unit.topicList.keys());
 
         // Filter user's progress to only include quizzes from this unit's topics
-        const relevantQuizScores = user.progress_on_quiz.filter(progress => 
+        const relevantQuizScores = user.progress_on_quiz.filter(progress =>
             unitTopicIds.includes(progress.topicId)
         );
 
@@ -126,14 +127,14 @@ export const getUnitAverageScore = async (req, res) => {
         }
 
         // Calculate average score
-        const totalScore = relevantQuizScores.reduce((sum, progress) => 
+        const totalScore = relevantQuizScores.reduce((sum, progress) =>
             sum + progress.quizScore, 0
         );
         const averageScore = totalScore / relevantQuizScores.length;
 
         return res.status(200).json({
             message: "Unit average score calculated successfully",
-            score : averageScore
+            score: averageScore
         });
 
     } catch (err) {
@@ -154,7 +155,7 @@ export const getSubjectHierarchy = async (req, res) => {
         // Process each subject
         for (const subject of subjects) {
             const subjectData = {
-                subjectId : subject._id,
+                subjectId: subject._id,
                 title: subject.title,
                 courses: [],
             };
@@ -186,7 +187,7 @@ export const getSubjectHierarchy = async (req, res) => {
                     subjectData.courses.push(courseData);
                 }
             }
-            
+
             hierarchicalData.push(subjectData);
         }
 
@@ -195,11 +196,11 @@ export const getSubjectHierarchy = async (req, res) => {
             data: hierarchicalData,
             summary: {
                 totalSubjects: hierarchicalData.length,
-                totalCourses: hierarchicalData.reduce((sum, subject) => 
+                totalCourses: hierarchicalData.reduce((sum, subject) =>
                     sum + subject.courses.length, 0
                 ),
-                totalUnits: hierarchicalData.reduce((sum, subject) => 
-                    sum + subject.courses.reduce((courseSum, course) => 
+                totalUnits: hierarchicalData.reduce((sum, subject) =>
+                    sum + subject.courses.reduce((courseSum, course) =>
                         courseSum + course.units.length, 0
                     ), 0
                 )
