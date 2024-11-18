@@ -24,8 +24,7 @@ const Quiz = () => {
                 headers: { 'Content-Type': 'application/json' },
             });
             if (res.status === 404) {
-                message.error('Quiz not found');
-                navigate(-1);
+                message.info("Let's Generate Quiz");
                 return;
             }
             const fetchedData = await res.json();
@@ -37,7 +36,35 @@ const Quiz = () => {
             console.error('Data not found', error.message);
         }
     };
+    // Generate a new quiz
+    const generateNewQuiz = async () => {
+        try {
+            setLoading(true);  // Set loading true during API call
+            const res = await fetch(`http://localhost:3001/users/${topicId}/getquiz`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (res.status === 404) {
+                message.info("No quiz found. Please try again later.");
+                return;
+            }
+            const fetchedData = await res.json();
+            setQuizData(fetchedData.quizArray);
+            setQuizId(fetchedData._id);
+            setSelectedOptions(Array(fetchedData.quizArray.mcq.length).fill(null));
+            setDescriptiveAnswers(Array(fetchedData.quizArray.descriptive.length).fill(""));
 
+            // Reset other states
+            setMcqAnswers([]);
+            setDescAnswers([]);
+            setResponse(null);
+        } catch (error) {
+            console.error('Error generating new quiz:', error.message);
+            message.error('Failed to generate new quiz');
+        } finally {
+            setLoading(false);  // Set loading false after API call completes
+        }
+    };
     const user_id = useSelector((state) => state.user?._id);
 
     const handleSubmit = async (e) => {
@@ -151,10 +178,17 @@ const Quiz = () => {
                         </div>
                     ))}
                     <div className={Styles.cont_button_div}>
-                        <button onClick={handleSubmit} className={Styles.cont_button}>
-                            Submit
+
+                        {(quizData?.mcq?.length > 0 || quizData?.descriptive?.length > 0) && (
+                            <button onClick={handleSubmit} className={Styles.cont_button}>
+                                Submit
+                            </button>
+                        )}
+                        <button className={Styles.cont_button_new} onClick={generateNewQuiz}>
+                            Generate New Quiz
                         </button>
                     </div>
+
                 </div>
             )}
         </>

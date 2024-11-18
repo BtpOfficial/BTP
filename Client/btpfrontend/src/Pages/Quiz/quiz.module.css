@@ -34,11 +34,26 @@
     transition: all ease 300ms;
 }
 
+.cont_button_new {
+    background-color: rgb(23, 93, 179);
+    color: white;
+    padding: 7px 10px;
+    width: 250px;
+    font-size: 20px;
+    border-radius: 7px;
+    font-weight: 500;
+    transition: all ease 300ms;
+
+}
+
+
 .cont_button_div {
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 100px;
+
 }
 
 .cont_button:hover {
