@@ -156,19 +156,22 @@ import User from "../models/User.js";
 
 export const verifyQuiz = async (req, res) => {
     try {
-        const { topicId, quizId } = req.params;
+        const { topicId } = req.params;
         const { user_id: userId, selectedOptions: user_response_mcq, descriptiveAnswers: user_response_descriptive } = req.body;
-
+         
         const user = await User.findById(userId);
-        const quiz = await Quiz.findById(quizId);
-
+        const quiz = await Quiz.findOne({topicId:topicId});
+        console.log(quiz)
+        console.log("ffff")
         if (!user || !quiz) {
             return res.status(404).json({ message: "User or Quiz not found" });
         }
+        console.log("hi")
+        console.log(quiz.quizArray)
 
         const actual_mcq = quiz.quizArray.mcq.map(question => question.correct);
         const actual_descriptive = quiz.quizArray.descriptive.map(question => question.answer);
-
+        console.log(actual_descriptive,actual_mcq)
         const mcqScores = [];
         const descriptiveScores = [];
         const answer = [];
@@ -248,6 +251,7 @@ export const verifyQuiz = async (req, res) => {
             message: "Quiz evaluated successfully",
             answer,
             answer1,
+            scorePercentage
         });
     } catch (err) {
         res.status(500).json({ message: err.message });

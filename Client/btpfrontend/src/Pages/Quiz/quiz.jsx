@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import Styles from "./quiz.module.css";
 import { message } from 'antd';
-import { BarLoader } from 'react-spinners';
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { BarLoader } from 'react-spinners';
+import Styles from "./quiz.module.css";
 
 const Quiz = () => {
     const [loading, setLoading] = useState(false);
@@ -15,6 +15,7 @@ const Quiz = () => {
     const [descriptiveAnswers, setDescriptiveAnswers] = useState([]);
     const [mcqAnswers, setMcqAnswers] = useState([]);
     const [descAnswers, setDescAnswers] = useState([]);
+    const [score, setScore] = useState(null);
     const navigate = useNavigate();
 
     const getQuiz = async () => {
@@ -40,9 +41,32 @@ const Quiz = () => {
             setLoading(false);
         }
     };
+    const getnewQuiz = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`http://localhost:3001/users/${topicId}/addorupdatequiz`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (res.status === 404) {
+                message.info("Let's Generate Quiz");
+                return;
+            }
+            const fetchedData = await res.json();
+            setQuizData(fetchedData.quiz.quizArray);
+            setQuizId(fetchedData._id);
+            setSelectedOptions(Array(fetchedData.quiz.quizArray.mcq.length).fill(null));
+            setDescriptiveAnswers(Array(fetchedData.quiz.quizArray.descriptive.length).fill(""));
+        } catch (error) {
+            console.error('Data not found', error.message);
+        }
+        finally {
+            setLoading(false);
+        }
+    };
     // Generate a new quiz
     const generateNewQuiz = async () => {
-        getQuiz();
+        await getnewQuiz();
     };
     const user_id = useSelector((state) => state.user?._id);
 
@@ -56,7 +80,7 @@ const Quiz = () => {
         }
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:3001/users/${topicId}/${quizId}/verify`, {
+            const res = await fetch(`http://localhost:3001/users/${topicId}/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id, selectedOptions, descriptiveAnswers })
@@ -64,6 +88,7 @@ const Quiz = () => {
             const fetchedData = await res.json();
             setMcqAnswers(fetchedData.answer)
             setDescAnswers(fetchedData.answer1)
+            setScore(fetchedData.scorePercentage)
             if (res.status === 200) {
                 window.scrollTo({
                     top: 0,
@@ -111,7 +136,7 @@ const Quiz = () => {
             ) : (
                 <div className={Styles.container}>
                     <div className={Styles.score}>
-                        {response && <p>You Scored - {response}%</p>}
+                        {score && <p>You Scored - {score}%</p>}
                     </div>
                     {quizData && quizData?.mcq && quizData?.mcq.map((questionObj, index) => (
                         <div key={index} className={Styles.container_ques}>

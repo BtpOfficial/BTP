@@ -1,22 +1,21 @@
 import express from "express";
 import {
-  verifyQuiz,
+  addCourse,
+  addOrUpdateQuiz,
+  addSubject,
   addTopic,
   addUnit,
-  addOrUpdateQuiz,
-  addCourse,
-  addSubject,
-  deleteTopic,
-  deleteUnit,
   deleteCourse,
   deleteSubject,
-  getQuiz
+  deleteTopic,
+  deleteUnit,
+  getQuiz,
+  verifyQuiz
 } from "../controllers/users.js";
-import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/:topicId/:quizId/verify", verifyQuiz);
+router.post("/:topicId/verify", verifyQuiz);
 router.post("/:subjectId/:courseId/:unitId/add", addTopic);
 router.post("/:subjectId/:courseId/add", addUnit);
 router.post("/:topicId/addorupdatequiz", addOrUpdateQuiz);
