@@ -133,10 +133,11 @@ Here is the format reference:
 }}
 
 Follow these instructions:
-1. Use the above example only as a format guide. Do not copy or repeat the example content.
-2. Generate exactly one new multiple-choice question about the topic "{topic}" with unique content.
-3. Strictly return only the JSON object as specified, with no additional text or commentary.
-4. Ensure the correct answers are distributed and not clustered together (e.g., don't always use the second option as the correct one).
+1. Use the above example only as a format guide. Do not copy or repeat the example content. 
+2. Correct should be only among "0", "1", "2", "3"
+3. Generate exactly one new multiple-choice question about the topic "{topic}" with unique content.
+4. Strictly return only the JSON object as specified, with no additional text or commentary.
+5. Ensure the correct answers are distributed and not clustered together (e.g., don't always use the second option as the correct one).
 
 Your response must follow the structure exactly but contain unique content relevant to the topic "{topic}".
 
@@ -221,9 +222,12 @@ def get_model_response(prompt):
 
         # Collect and process the streamed output
         output = ""
+        # print("kk")
+        # print(stream)
+        # print("kk")
         for chunk in stream:
-            delta = chunk.choices[0].delta.get("content", "")
-            output += delta
+            delta = chunk.choices[0].delta
+            output += delta.content if delta.content else ""
 
         return output
 
@@ -235,7 +239,14 @@ def generate_quiz(topic):
 
     # Generate MCQs
     mcq_prompt = generate_formatted_prompt(topic=topic)[0]
+    # print(mcq_prompt)
     mcq_response = get_model_response(mcq_prompt)
+
+    # print(mcq_response)
+
+    # print("ss")
+    # print(mcq_response)
+    # print("ss")
     try:
         mcq_data = json.loads(mcq_response)
         if "mcq" in mcq_data:
@@ -246,6 +257,10 @@ def generate_quiz(topic):
     # Generate Descriptive Questions
     descriptive_prompt = generate_formatted_prompt(topic=topic)[1]
     descriptive_response = get_model_response(descriptive_prompt)
+    # print("ehllo")
+    # print(descriptive_response)
+    # print("fff")
+
     try:
         descriptive_data = json.loads(descriptive_response)
         if "descriptive" in descriptive_data:
@@ -253,6 +268,9 @@ def generate_quiz(topic):
     except json.JSONDecodeError:
         raise Exception("Error parsing descriptive response")
 
+    # print("ssdfsdf")
+    # print(quizArray)
+    # print("sssfds")
     return quizArray
 
 @app.route('/receive_quiz_topic', methods=['POST'])
@@ -260,11 +278,17 @@ def receive_quiz_topic():
     """Endpoint to receive a quiz topic and generate questions."""
     try:
         topic = request.json.get("topicTitle", "")
+        print(topic)
         if not topic:
             return jsonify({"error": "Topic is required"}), 400
 
         # Generate the quiz
         quizArray = generate_quiz(topic)
+
+        # print("uy")
+        # print(quizArray)
+        # print("ut")
+
         return jsonify(quizArray), 200
     except Exception as e:
         print(f"Error: {e}")

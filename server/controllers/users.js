@@ -1,10 +1,10 @@
+import axios from 'axios';
 import Course from "../models/Course.js";
 import Quiz from "../models/Quiz.js";
 import Subject from "../models/Subject.js";
 import Topic from "../models/Topic.js";
 import Unit from "../models/Unit.js";
 import User from "../models/User.js";
-import axios from 'axios';
 
 // export const markComplete = async (req, res) => {
 //     try {
@@ -313,11 +313,11 @@ export const addOrUpdateQuiz = async (req, res) => {
             return res.status(400).json({ message: "topicId and topic are required" });
         }
 
-        console.log("Hi")
+        // console.log("Hi")
         const topic = await Topic.findById(topicId);
         const topicTitle = topic.title;
 
-        console.log("Hi")
+        // console.log("Hi")
 
         let quizArray;
 
@@ -331,8 +331,11 @@ export const addOrUpdateQuiz = async (req, res) => {
                     }
                 }
             );
-            console.log("Received quizArray from Flask:", response);
+            // console.log("Received quizArray from Flask:", response);
             quizArray = response.data; // Extract quizArray from response data
+            console.log("ffffffffffffffffffff")
+            console.log(quizArray)
+            console.log("fffffffffff")
 
             console.log("Received quizArray from Flask:", quizArray); // Debug log
         } catch (error) {
