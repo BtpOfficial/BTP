@@ -19,6 +19,7 @@ const Quiz = () => {
 
     const getQuiz = async () => {
         try {
+            setLoading(true);
             const res = await fetch(`http://localhost:3001/users/${topicId}/getquiz`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -35,35 +36,13 @@ const Quiz = () => {
         } catch (error) {
             console.error('Data not found', error.message);
         }
+        finally {
+            setLoading(false);
+        }
     };
     // Generate a new quiz
     const generateNewQuiz = async () => {
-        try {
-            setLoading(true);  // Set loading true during API call
-            const res = await fetch(`http://localhost:3001/users/${topicId}/getquiz`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            });
-            if (res.status === 404) {
-                message.info("No quiz found. Please try again later.");
-                return;
-            }
-            const fetchedData = await res.json();
-            setQuizData(fetchedData.quizArray);
-            setQuizId(fetchedData._id);
-            setSelectedOptions(Array(fetchedData.quizArray.mcq.length).fill(null));
-            setDescriptiveAnswers(Array(fetchedData.quizArray.descriptive.length).fill(""));
-
-            // Reset other states
-            setMcqAnswers([]);
-            setDescAnswers([]);
-            setResponse(null);
-        } catch (error) {
-            console.error('Error generating new quiz:', error.message);
-            message.error('Failed to generate new quiz');
-        } finally {
-            setLoading(false);  // Set loading false after API call completes
-        }
+        getQuiz();
     };
     const user_id = useSelector((state) => state.user?._id);
 

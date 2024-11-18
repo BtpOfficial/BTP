@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["Male", "Female", "Other"]
     },
-    
+
     // progress: [
     //   {
     //     subjectId: String,
@@ -49,8 +49,8 @@ const UserSchema = new mongoose.Schema(
     progress_on_quiz: [
       {
         topicId: String,
-        topicTitle : String,
-        quizScore : Number,
+        topicTitle: String,
+        quizScore: Number,
       }
     ]
   },

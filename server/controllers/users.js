@@ -230,19 +230,19 @@ export const verifyQuiz = async (req, res) => {
 
         const topic = await Topic.findById(topicId);
         const topicTitle = topic.title;
-    
-    // If topic doesn't exist in progress, create new entry
-    if (!topicProgress) {
-        topicProgress = { 
-            topicId,
-            topicTitle,
-            quizScore: scorePercentage  // Directly assign the score
-        };
-        user.progress_on_quiz.push(topicProgress);
-    } else {
-        // Update existing score
-        topicProgress.quizScore = scorePercentage;
-    }
+
+        // If topic doesn't exist in progress, create new entry
+        if (!topicProgress) {
+            topicProgress = {
+                topicId,
+                topicTitle,
+                quizScore: scorePercentage  // Directly assign the score
+            };
+            user.progress_on_quiz.push(topicProgress);
+        } else {
+            // Update existing score
+            topicProgress.quizScore = scorePercentage;
+        }
         await user.save();
         res.status(200).json({
             message: "Quiz evaluated successfully",
@@ -293,7 +293,7 @@ export const addUnit = async (req, res) => {
 
         // Update the course
         const course = await Course.findById(courseId);
-     
+
         course.unitList.set(savedUnit._id.toString(), title);
         await course.save();
 
@@ -308,19 +308,22 @@ export const addOrUpdateQuiz = async (req, res) => {
     try {
         const { topicId } = req.params;
 
-         // Validate input
-        if (!topicId ) {
+        // Validate input
+        if (!topicId) {
             return res.status(400).json({ message: "topicId and topic are required" });
         }
 
+        console.log("Hi")
         const topic = await Topic.findById(topicId);
         const topicTitle = topic.title;
+
+        console.log("Hi")
 
         let quizArray;
 
         try {
             // Send data to Flask and receive response
-            const response = await axios.post('http://localhost:5000/receive_quiz_topic', 
+            const response = await axios.post('http://localhost:5000/receive_quiz_topic',
                 { topicTitle }, // Send topic as JSON
                 {
                     headers: {
@@ -330,6 +333,7 @@ export const addOrUpdateQuiz = async (req, res) => {
             );
             console.log("Received quizArray from Flask:", response);
             quizArray = response.data; // Extract quizArray from response data
+
             console.log("Received quizArray from Flask:", quizArray); // Debug log
         } catch (error) {
             console.error('Error sending data to Flask:', error.message);
@@ -376,8 +380,8 @@ export const addCourse = async (req, res) => {
         const { subjectId } = req.params;
         const { title } = req.body;
 
-         // Validate required fields
-         if (!title) {
+        // Validate required fields
+        if (!title) {
             return res.status(400).json({ message: "Title is required" });
         }
 
@@ -425,52 +429,52 @@ export const deleteTopic = async (req, res) => {
     try {
         const { unitId, topicId } = req.params;
 
-    // Validate all IDs are provided
-    if (!unitId || !topicId) {
-      return res.status(400).json({ 
-        message: "Missing required parameters" 
-      });
-    }
+        // Validate all IDs are provided
+        if (!unitId || !topicId) {
+            return res.status(400).json({
+                message: "Missing required parameters"
+            });
+        }
 
-    // Delete the topic
-    const deletedTopic = await Topic.findByIdAndDelete(topicId);
-    if (!deletedTopic) {
-      return res.status(404).json({ message: "Topic not found" });
-    }
+        // Delete the topic
+        const deletedTopic = await Topic.findByIdAndDelete(topicId);
+        if (!deletedTopic) {
+            return res.status(404).json({ message: "Topic not found" });
+        }
 
-    // Delete all associated quizzes
-    const deleteQuizResult = await Quiz.deleteMany({ topicId: topicId });
+        // Delete all associated quizzes
+        const deleteQuizResult = await Quiz.deleteMany({ topicId: topicId });
 
-    // Find and update the unit
-    const unit = await Unit.findById(unitId);
-    if (!unit) {
-      return res.status(404).json({ message: "Unit not found" });
-    }
+        // Find and update the unit
+        const unit = await Unit.findById(unitId);
+        if (!unit) {
+            return res.status(404).json({ message: "Unit not found" });
+        }
 
-    if (!unit.topicList.has(topicId)) {
-      return res.status(404).json({ 
-        message: "Topic not found in the unit" 
-      });
-    }
+        if (!unit.topicList.has(topicId)) {
+            return res.status(404).json({
+                message: "Topic not found in the unit"
+            });
+        }
 
-    // Remove topic from unit's topicList
-    unit.topicList.delete(topicId);
-    await unit.save();
+        // Remove topic from unit's topicList
+        unit.topicList.delete(topicId);
+        await unit.save();
 
-    // Update user progress
-    const updateUserResult = await User.updateMany(
-      { 'progress_on_quiz.topicId': topicId },
-      { $pull: { progress_on_quiz: { topicId: topicId } } }
-    );
+        // Update user progress
+        const updateUserResult = await User.updateMany(
+            { 'progress_on_quiz.topicId': topicId },
+            { $pull: { progress_on_quiz: { topicId: topicId } } }
+        );
 
-    return res.status(200).json({
-      message: "Topic, associated quizzes, and user progress deleted successfully",
-      details: {
-        topicDeleted: deletedTopic._id,
-        quizzesDeleted: deleteQuizResult.deletedCount,
-        usersUpdated: updateUserResult.modifiedCount
-      }
-    });
+        return res.status(200).json({
+            message: "Topic, associated quizzes, and user progress deleted successfully",
+            details: {
+                topicDeleted: deletedTopic._id,
+                quizzesDeleted: deleteQuizResult.deletedCount,
+                usersUpdated: updateUserResult.modifiedCount
+            }
+        });
 
 
     } catch (err) {
@@ -486,8 +490,8 @@ export const deleteUnit = async (req, res) => {
 
         // Validate parameters
         if (!courseId || !unitId) {
-            return res.status(400).json({ 
-                message: "Missing required parameters" 
+            return res.status(400).json({
+                message: "Missing required parameters"
             });
         }
 
@@ -538,7 +542,7 @@ export const deleteUnit = async (req, res) => {
         course.unitList.delete(unitId);
         await course.save();
 
-        return res.status(200).json({ 
+        return res.status(200).json({
             message: "Unit and all associated data deleted successfully",
             details: {
                 unitDeleted: unitId,
@@ -549,7 +553,7 @@ export const deleteUnit = async (req, res) => {
 
     } catch (err) {
         console.error('Delete Unit Error:', err);
-        return res.status(500).json({ 
+        return res.status(500).json({
             message: "Internal server error",
         });
     }
@@ -563,8 +567,8 @@ export const deleteCourse = async (req, res) => {
 
         // Validate parameters
         if (!subjectId || !courseId) {
-            return res.status(400).json({ 
-                message: "Missing required parameters" 
+            return res.status(400).json({
+                message: "Missing required parameters"
             });
         }
 
@@ -657,8 +661,8 @@ export const deleteSubject = async (req, res) => {
 
         // Validate parameter
         if (!subjectId) {
-            return res.status(400).json({ 
-                message: "Missing required parameter: subjectId" 
+            return res.status(400).json({
+                message: "Missing required parameter: subjectId"
             });
         }
 
