@@ -136,7 +136,7 @@ const Quiz = () => {
             ) : (
                 <div className={Styles.container}>
                     <div className={Styles.score}>
-                        {score && <p>You Scored - {score}%</p>}
+                        {score!==null && <p>You Scored - {score}%</p>}
                     </div>
                     {quizData && quizData?.mcq && quizData?.mcq.map((questionObj, index) => (
                         <div key={index} className={Styles.container_ques}>

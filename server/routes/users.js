@@ -5,27 +5,19 @@ import {
   addSubject,
   addTopic,
   addUnit,
+  assessMe,
   deleteCourse,
   deleteSubject,
-<<<<<<< Updated upstream
   deleteTopic,
   deleteUnit,
   getQuiz,
   verifyQuiz
-=======
-  getQuiz,
-  assessMe
->>>>>>> Stashed changes
 } from "../controllers/users.js";
 
 const router = express.Router();
 
-<<<<<<< Updated upstream
 router.post("/:topicId/verify", verifyQuiz);
-=======
 router.post("/assessMe",assessMe)
-router.post("/:topicId/:quizId/verify", verifyQuiz);
->>>>>>> Stashed changes
 router.post("/:subjectId/:courseId/:unitId/add", addTopic);
 router.post("/:subjectId/:courseId/add", addUnit);
 router.post("/:topicId/addorupdatequiz", addOrUpdateQuiz);
