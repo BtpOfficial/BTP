@@ -3,7 +3,8 @@ import Course from "../models/Course.js"
 import Unit from "../models/Unit.js";
 import Quiz from "../models/Quiz.js";
 import Topic from "../models/Topic.js";
-import User from '../models/User.js'
+import User from "../models/User.js";
+
 export const getSubjectList = async (req, res) => {
     try {
         const subjectList = await Subject.find();

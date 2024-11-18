@@ -32,7 +32,6 @@ export const register = async (req, res) => {
       password: passwordHash,
       qualification,
       gender,
-      progress: [],
       progress_on_quiz: [],
     });
 

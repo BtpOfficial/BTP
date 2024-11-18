@@ -1,13 +1,19 @@
 from flask import Flask, request, jsonify
 import requests
 import time
+import json
+import re
+from huggingface_hub import InferenceClient
 
 app = Flask(__name__)
 
 API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/msmarco-distilbert-base-tas-b"
+API_URL2 = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-1B-Instruct"
 api_token = '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'
 headers = {"Authorization": f"Bearer {api_token}"}
 
+
+# for evaluating quiz using LLM
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
     try:
@@ -16,7 +22,6 @@ def query(payload):
         return {"error": "Invalid response from API"}
 
 @app.route('/receive_data', methods=['POST'])
-
 def receive_data():
     print("hello")
     sentence_sets = request.json
@@ -58,6 +63,22 @@ def receive_data():
 
     response_data = {'message': 'Data received successfully', 'results': results}
     return jsonify(response_data)
+
+@app.route('/receive_quiz_topic', methods=['POST'])
+def receive_quiz_topic():
+    """Endpoint to receive a quiz topic and generate questions."""
+    try:
+        topic = request.json.get("topic", "")
+        if not topic:
+            return jsonify({"error": "Topic is required"}), 400
+
+        quiz_gen = QuizGenerator()
+        quizArray = quiz_gen.generate_quiz(topic)
+        return jsonify(quizArray), 200
+    except Exception as e:
+        return jsonify({"mcq": [], "descriptive": []}), 500
+
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)

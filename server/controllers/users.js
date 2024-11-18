@@ -307,15 +307,39 @@ export const addUnit = async (req, res) => {
 export const addOrUpdateQuiz = async (req, res) => {
     try {
         const { topicId } = req.params;
-        const { quizArray } = req.body;
+
+         // Validate input
+        if (!topicId ) {
+            return res.status(400).json({ message: "topicId and topic are required" });
+        }
+
+        const topic = await Topic.findById(topicId);
+        const topicTitle = topic.title;
+
+        let quizArray;
+
+        try {
+            // Send data to Flask and receive response
+            const response = await axios.post('http://localhost:5000/receive_quiz_topic', 
+                { topicTitle }, // Send topic as JSON
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            console.log("Received quizArray from Flask:", response);
+            quizArray = response.data; // Extract quizArray from response data
+            console.log("Received quizArray from Flask:", quizArray); // Debug log
+        } catch (error) {
+            console.error('Error sending data to Flask:', error.message);
+            return res.status(500).json({ error: "Error generating quiz from Flask service" });
+        }
 
         // Validate quizArray structure
         if (!quizArray || !quizArray.mcq || !quizArray.descriptive) {
             return res.status(400).json({ message: "Invalid quiz structure" });
         }
-
-        const topic = await Topic.findById(topicId);
-        const topicTitle = topic.title;
 
         let quiz = await Quiz.findOne({ topicId: topicId });
 
