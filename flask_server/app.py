@@ -204,9 +204,9 @@ def get_model_response(prompt):
 
     messages = [
         {
-            "role": "system",
-            "content": "You are a quiz generator that returns only valid JSON responses with no additional text or explanations."
-        },
+  "role": "system",
+  "content": "You are a quiz generator. You must return only a valid JSON response containing exactly five multiple-choice questions (MCQs) and five descriptive questions with their answers. No additional text or explanations should be included in the response."
+},
         {
             "role": "user",
             "content": prompt
@@ -220,6 +220,7 @@ def get_model_response(prompt):
             messages=messages,
             max_tokens=3000,
             stream=True,
+            stop=["<END>"],
             temperature=0.5
         )
 
@@ -298,44 +299,47 @@ def receive_quiz_topic():
         return jsonify({"error": "An error occurred while generating the quiz."}), 500
     
 
-def gen_prompt_for_improvement(progress_on_quiz) : 
-    prompt = """I am building an educational platform where users take quizzes on various topics. Based on their quiz performance, I want to provide personalized feedback and suggest an appropriate learning path to improve their understanding.
+def gen_prompt_for_improvement():
+    prompt = """
+You are an AI assistant that generates natural language sentences for users to improve their learning on an educational platform where quizzes are taken on various topics. Your task is to generate personalized feedback for the user based **exclusively** on the topics and scores provided in the `progress_on_quiz` variable.
 
-Here is a user's quiz progress {{progress_on_quiz}}
+`progress_on_quiz`: ${ new_array }
 
-Goal:
-Generate a personalized, concise, and precise learning path for the user based on the quiz scores provided in the progress_on_quiz variable. 
+### Goal:
+Provide personalized recommendations in simple natural language sentences in short bullet points.
 
-Instructions:
-1. Use the quiz scores in the progress_on_quiz variable to determine:
-   - For scores below 50: Recommend foundational concepts and beginner-level resources.
-   - For scores between 50 and 70: Suggest intermediate revision materials or practice problems.
-   - For scores above 70: Recommend advanced topics or related areas to explore.
-2. Ensure the feedback is concise, actionable, and tailored to the user’s needs.
-3. Use the example below only to understand the output style. Do not copy its content directly; base your output solely on the input provided in progress_on_quiz.
+### Instructions:
+1. Analyze the topics and scores in the `progress_on_quiz`
+2. For each topic in the input:
+   - Assess the user's performance based on their score.
+   - Provide concise, actionable feedback directly related to the topic and score in natural language sentences.
+3. Ensure the feedback includes:
+   - A summary of the user's performance for the topic.
+   - Specific suggestions to improve their understanding.
+   - Optional resource recommendations relevant to the topic.
+4. **Do not** write code or reference topics or scores not included in the input.
+5. Output only plain text in the format specified below.
 
-Example output format:
+### Output Format:
+For each topic:
+- Topic: topicTitle , Score: quizScore
+  - Action Plan: personalized feedback based on the score
+  - Resource: optional resource suggestion for further learning
 
-Topic: Time Complexity (Score: 45)
-Action Plan: Review basics of Big O notation and practice complexity analysis.
-Resource: [Beginner's Guide to Time Complexity (YouTube)]
+### Example Output:
+- Topic: Time Complexity (Score: 45)
+  - Action Plan: Review basics of Big O notation and practice complexity analysis.
+  - Resource: [Beginner's Guide to Time Complexity (YouTube)]
 
-Topic: Sorting Algorithms (Score: 75)
-Action Plan: Explore advanced techniques like radix sort and external sorting.
-Resource: [LeetCode Sorting Section]
+- Topic: Sorting Algorithms (Score: 75)
+  - Action Plan: Explore advanced techniques like radix sort and external sorting.
+  - Resource: [LeetCode Sorting Section]
 
-Topic: Recursion (Score: 35)
-Action Plan: Focus on stack operations and recursion basics. Solve problems like factorial and Fibonacci sequence.
-Resource: [Recursion Basics (YouTube)]
-
-Topic: Dynamic Programming (Score: 60)
-Action Plan: Strengthen memoization and tabulation methods. Practice problems: knapsack and LCS.
-Resource: [GeeksforGeeks DP Section]
-
-Note: Use the example only for output format. Tailor your response strictly to the data provided in progress_on_quiz.
- """
-    
+### Note:
+- Stick strictly to the topics and scores provided in `progress_on_quiz`.
+"""
     return prompt
+
 
 # for evaluating quiz using LLM
 def get_model_response_improvement(prompt):
@@ -345,24 +349,24 @@ def get_model_response_improvement(prompt):
     )
 
     messages = [
-        {
-            "role": "system",
-            "content": "You are an expert educational advisor for an online learning platform. Your role is to analyze users' quiz performance data and provide tailored feedback"
-        },
-        {
-            "role": "user",
-            "content": prompt
-        }
-    ]
+
+{
+  "role": "system",
+  "content": "You are an AI assistant that generates recommendations and responses in natural, human-like language. You must avoid generating any code, focusing purely on textual explanations and advice."
+},
+	{ "role": "user", "content": prompt },
+]
+
 
     try:
         # Call the model with streaming enabled
         stream = client.chat.completions.create(
-            model="meta-llama/Llama-3.2-1B-Instruct",
-            messages=messages,
-            max_tokens=2000,
-            stream=True,
-            temperature=0.7
+        model="meta-llama/Llama-3.2-1B-Instruct",
+	      messages= messages,
+	      max_tokens=3000,
+        stop=["<END>"],
+        temperature = 0.1,
+	      stream=True
         )
 
         # Collect and process the streamed output
@@ -390,7 +394,8 @@ def receive_for_improvement():
             return jsonify({"error": "Progress_on_quiz is required"}), 400
 
         # Generate the quiz
-        prompt = gen_prompt_for_improvement(progress_on_quiz)
+        new_array = [{k: v for k, v in item.items() if k != "topicId"} for item in progress_on_quiz]
+        prompt = gen_prompt_for_improvement().replace("${ new_array }" , str(new_array))
         response = get_model_response_improvement(prompt)
 
         return jsonify(response), 200
