@@ -1,15 +1,20 @@
+import CircularProgress from "@mui/material/CircularProgress";
 import { message, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import IMG from "../../assets/profile.jpg";
 import DropdownComponent from './Dropdown';
-
 const Profile = () => {
   const navigate = useNavigate();
   const data = useSelector((state) => state.user);
   const data1 = useSelector((state) => state.id);
-  const [adata,setAdata]=useState(null)
+  const [adata, setAdata] = useState(
+    <div style={{ display: "flex",flexDirection:"column-reverse", alignItems: "center", justifyContent: "center", height: "100%" }}>
+      <CircularProgress />
+      <span style={{ marginLeft: "10px" }}>Let LLM Cook...</span>
+    </div>
+  );
   console.log(data1);
 
   const isProfile = () => {
@@ -57,8 +62,8 @@ const Profile = () => {
   }
   }
   const showModal = async() => {
-     await getassessment();
     setIsModalOpen(true);
+     await getassessment();
   };
 
   const handleOk = () => {
@@ -99,8 +104,7 @@ const Profile = () => {
       OK
     </button>,
   ]}>
-        <p>Here is generated response...</p>
-        <p>{adata}</p>
+        <p style={{height:"400px" , overflowY:"scroll",padding:"10px"}}>{adata}</p>
       </Modal>
     <div className="max-w-screen mx-auto my-8 flex gap-[5%]">
       {/* Left Box: Profile Details (60% width) */}
