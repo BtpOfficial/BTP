@@ -12,7 +12,8 @@ api_key="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"
 )
 app = Flask(__name__)
 
-API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/msmarco-distilbert-base-tas-b"
+# API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/msmarco-distilbert-base-tas-b"
+API_URL = "https://api-inference.huggingface.co/models/sentence-transformers/all-MiniLM-L12-v2"
 API_URL2 = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-1B-Instruct"
 api_token = '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'
 api_key = "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"
@@ -58,8 +59,10 @@ def receive_data():
         else:
             similarity_score = 0  # Default to 0 if the response format is unexpected
 
-        accuracy = f"{similarity_score * 100:.2f}%"  # Convert to percentage and format to two decimal places
+        similarity_score = max(0,similarity_score)
 
+        accuracy = f"{similarity_score * 100:.2f}%"  # Convert to percentage and format to two decimal places
+       
         result_set = {
             "your_answer": sentence_set["source_sentence"],
             "right_answer": sentence_set["user_sentences"],
