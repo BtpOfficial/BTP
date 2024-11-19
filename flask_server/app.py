@@ -301,51 +301,38 @@ def receive_quiz_topic():
 def gen_prompt_for_improvement(progress_on_quiz) : 
     prompt = """I am building an educational platform where users take quizzes on various topics. Based on their quiz performance, I want to provide personalized feedback and suggest an appropriate learning path to improve their understanding.
 
-Here is a user's quiz progress::
-{{
-
-[
-  {{
-    "topicId": "id1",
-    "topicTitle": "Time Complexity",
-    "quizScore": 45
-  }},
-  {{
-    "topicId": "id2",
-    "topicTitle": "Sorting Algorithms",
-    "quizScore": 75
-  }},
-  {{
-    "topicId": "id3",
-    "topicTitle": "Recursion",
-    "quizScore": 35
-  }},
-  {{
-    "topicId": "id4",
-    "topicTitle": "Dynamic Programming",
-    "quizScore": 60
-  }}
-]
-}}
+Here is a user's quiz progress {{progress_on_quiz}}
 
 Goal:
-Provide a concise, precise, and personalized learning path based on the quiz scores provided {progress_on_quiz}.
+Generate a personalized, concise, and precise learning path for the user based on the quiz scores provided in the progress_on_quiz variable. 
 
 Instructions:
-Identify topics where the user scored below 50 and recommend foundational concepts and beginner-level resources.
-For scores between 50 -70, suggest intermediate revision materials or practice problems.
-For scores above 70, provide advanced topics or related areas to explore.
-Ensure the feedback is concise, actionable, and tailored to the user’s needs. Avoid unnecessary details.
-Example:
-Time Complexity (45):
-Action Plan: Review basics of Big O notation and practice complexity analysis. Resource: [Beginner's Guide to Time Complexity (YouTube)].
-Sorting Algorithms (75):
-Action Plan: Explore advanced techniques like radix sort and external sorting. Resource: [LeetCode Sorting Section].
-Recursion (35):
-Action Plan: Focus on stack operations and recursion basics. Solve problems like factorial and Fibonacci sequence. Resource: [Recursion Basics (YouTube)].
-Dynamic Programming (60):
-Action Plan: Strengthen memoization and tabulation methods. Practice problems: knapsack and LCS. Resource: [GeeksforGeeks DP Section].
+1. Use the quiz scores in the progress_on_quiz variable to determine:
+   - For scores below 50: Recommend foundational concepts and beginner-level resources.
+   - For scores between 50 and 70: Suggest intermediate revision materials or practice problems.
+   - For scores above 70: Recommend advanced topics or related areas to explore.
+2. Ensure the feedback is concise, actionable, and tailored to the user’s needs.
+3. Use the example below only to understand the output style. Do not copy its content directly; base your output solely on the input provided in progress_on_quiz.
 
+Example output format:
+
+Topic: Time Complexity (Score: 45)
+Action Plan: Review basics of Big O notation and practice complexity analysis.
+Resource: [Beginner's Guide to Time Complexity (YouTube)]
+
+Topic: Sorting Algorithms (Score: 75)
+Action Plan: Explore advanced techniques like radix sort and external sorting.
+Resource: [LeetCode Sorting Section]
+
+Topic: Recursion (Score: 35)
+Action Plan: Focus on stack operations and recursion basics. Solve problems like factorial and Fibonacci sequence.
+Resource: [Recursion Basics (YouTube)]
+
+Topic: Dynamic Programming (Score: 60)
+Action Plan: Strengthen memoization and tabulation methods. Practice problems: knapsack and LCS.
+Resource: [GeeksforGeeks DP Section]
+
+Note: Use the example only for output format. Tailor your response strictly to the data provided in progress_on_quiz.
  """
     
     return prompt
