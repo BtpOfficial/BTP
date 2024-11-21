@@ -74,12 +74,97 @@ def receive_data():
     return jsonify(response_data)
 
 
-def generate_formatted_prompt(topic):
-        mcq_prompt = f"""You are tasked with generating exactly five diverse multiple-choice questions (MCQs) in JSON format. Ensure the questions cover a variety of subtopics and difficulty levels relevant to the topic "{topic}". Structure your response in the specified format, ensuring
-    1. Options are varied and not repetitive across questions.
-    2. Correct answers are clearly identified and marked using the given format.
+# def clean_json(input_str):
+#     # Strip leading and trailing whitespace
+#     input_str = input_str.strip()
+    
+#     # Alternate trimming characters from the front and back
+#     front = True
+#     while input_str:
+#         try:
+#             # Try parsing the string as JSON
+#             return json.loads(input_str)
+#         except json.JSONDecodeError:
+#             # Remove one character alternately from front and back
+#             if front:
+#                 input_str = input_str[1:]  # Remove the first character
+#             else:
+#                 input_str = input_str[:-1]  # Remove the last character
+#             front = not front  # Switch to the other end next time
+#     raise ValueError("Unable to extract valid JSON from input")
 
-Here is the format reference:
+
+
+
+# def query(payload):
+#     response = requests.post(API_URL, headers=headers, json=payload)
+#     try:
+#         return response.json()
+#     except ValueError:
+#         return {"error": "Invalid response from API"}
+
+# @app.route('/receive_data', methods=['POST'])
+# def receive_data():
+#     print("hello")
+#     sentence_sets = request.json
+#     print(f"Received data: {sentence_sets}")
+
+#     results = []
+#     for sentence_set in sentence_sets:
+#         # Prepare the payload with the question and context
+#         payload = {
+#             "inputs": {
+#                 "question": sentence_set["source_sentence"],  # Treat as the question
+#                 "context": sentence_set["user_sentences"]     # Treat as the context
+#             }
+#         }
+#         response_data = query(payload)
+#         print(f"API response: {response_data}")
+
+#         # Retry logic for when the model is loading
+#         if isinstance(response_data, dict) and "error" in response_data and "currently loading" in response_data["error"]:
+#             print("Model is currently loading, waiting before retrying...")
+#             time.sleep(20)  # Wait for 20 seconds before retrying
+#             response_data = query(payload)
+#             print(f"API response after retrying: {response_data}")
+
+#         # Extract the answer and confidence from the response
+#         if isinstance(response_data, dict) and "answer" in response_data:
+#             answer = response_data.get("answer", "N/A")  # Extract the predicted answer
+#             confidence = response_data.get("score", 0)  # Extract confidence score (default 0)
+#         else:
+#             answer = "N/A"
+#             confidence = 0
+
+#         accuracy = f"{confidence * 100:.2f}%"  # Convert to percentage and format to two decimal places
+
+#         result_set = {
+#             "your_answer": sentence_set["source_sentence"],
+#             "right_answer": sentence_set["user_sentences"],
+#             "predicted_answer": answer,
+#             "accuracy": accuracy
+#         }
+#         results.append(result_set)
+
+#     response_data = {'message': 'Data received successfully', 'results': results}
+#     return jsonify(response_data)
+
+
+
+def generate_formatted_prompt(topic):
+        mcq_prompt = f"""
+You are tasked with generating exactly five diverse multiple-choice questions (MCQs) in valid JSON format. Each question should be relevant to the topic "{topic}", covering a variety of subtopics and difficulty levels. Follow these detailed instructions:
+
+1. **Content Requirements**:
+   - Ensure options are varied, clear, and not repetitive across questions.
+   - Clearly indicate the correct answer by specifying its index as "0", "1", "2", or "3".
+
+2. **Formatting Rules**:
+   - Return the response as a single JSON object.
+   - Adhere strictly to the provided JSON structure. No additional text, explanations, or deviations are allowed.
+   - Structure the JSON with exactly five MCQs as shown in the format example below.
+
+3. **Example Format** (do not repeat the example content, only use it as a structural reference):
 {{
   "mcq": [
     {{
@@ -135,24 +220,30 @@ Here is the format reference:
   ]
 }}
 
-Follow these instructions:
-1. Use the above example only as a format guide. Do not copy or repeat the example content. 
-2. Correct should be only among "0", "1", "2", "3"
-3. Generate exactly one new multiple-choice question about the topic "{topic}" with unique content.
-4. Strictly return only the JSON object as specified, with no additional text or commentary.
-5. Ensure the correct answers are distributed and not clustered together (e.g., don't always use the second option as the correct one).
+4. **Response Behavior**:
+   - Avoid clustering the correct answers (e.g., do not always use the same index for correct options).
+   - Use unique content for each question, relevant to the topic "{topic}".
 
-Your response must follow the structure exactly but contain unique content relevant to the topic "{topic}".
+5. **Output Expectations**:
+   - Return **only** the JSON object. Do not include any additional explanations, commentary, or text.
 
+Generate exactly five multiple-choice questions in valid JSON format following these instructions.
 """
 
-        descriptive_prompt = f"""You are tasked with generating exactly five descriptive questions and their corresponding answers in JSON format. Ensure the questions are diverse, unique, and relevant to the topic "{topic}". Structure your response using the given format, ensuring:
 
-1. Questions vary in focus, such as conceptual understanding, practical applications, detailed processes, or critical comparisons within the topic.
-2. Answers are comprehensive yet concise, providing clear explanations or steps as needed.
-3. Avoid using similar phrasing, concepts. 
+        descriptive_prompt = f"""
+You are tasked with generating exactly five descriptive questions and their corresponding answers in valid JSON format. The questions should be diverse, unique, and relevant to the topic "{topic}". Follow these detailed instructions:
 
-Here is the format reference:
+1. **Content Requirements**:
+   - Each question should focus on different aspects of the topic
+   - Answers should be concise yet comprehensive, providing clear explanations, definitions, or steps.
+
+2. **Formatting Rules**:
+   - Return the response as a single JSON object.
+   - Adhere strictly to the provided JSON structure. No additional text, explanations, or deviations are allowed.
+   - Ensure that questions and answers avoid repetition or overlap in phrasing or content.
+
+3. **Example Format** (use as a structural guide only):
 {{
   "descriptive": [
     {{
@@ -178,21 +269,54 @@ Here is the format reference:
   ]
 }}
 
-Follow these instructions:
-1. Use the above example only as a format guide. Do not copy or repeat the example.
-2. Generate exactly one new descriptive question about the topic "{topic}" and its answer.
-3. Strictly return only the JSON object as specified, with no additional text or commentary.
-4. Avoid using similar or overlapping content from the example provided.
+4. **Response Behavior**:
+   - Do not use content similar to the example provided above.
+   - Ensure each question is unique and introduces a new aspect of the topic "{topic}".
+   - Strictly return only the JSON object. Any additional text, commentary, or explanations will invalidate the response.
 
+5. **Output Expectations**:
+   - Generate exactly five descriptive questions and their corresponding answers in valid JSON format.
+   - Avoid overlapping content and ensure variety in the focus and structure of each question.
 
-Your response must follow the structure exactly but contain unique content relevant to the topic "{topic}".
-
+Generate the JSON object now.
 """
+
 
         return [mcq_prompt, descriptive_prompt]
 
 
 
+system_quiz = """" You are a quiz and answer generator. Your task is to create well-structure and valid JSON responses for two distinct types of content: multiple-choice questions (MCQs) and descriptive questions with answers. Follow these guidelines strictly to ensure valid and high-quality output:
+
+### General Rules:
+1. Always return a valid JSON object. Responses with additional text, commentary, or deviations from the specified format are not acceptable.
+2. Ensure all questions are relevant to the given topic and exhibit diversity in focus, subtopics, and difficulty levels.
+3. Avoid repetitive phrasing, overlapping content, or clustering of correct answers in MCQs.
+4. Use the provided JSON structures for each type of content.
+### For MCQs:
+Generate a valid JSON object with exactly five multiple-choice questions, structured as follows:
+{
+  "mcq": [
+    {
+      "question": "Sample question text?",
+      "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "correct": "index of correct option (0, 1, 2, or 3)"
+    },
+    ...
+  ]
+} 
+### For Descriptive:
+Generate a valid JSON object with exactly five descriptive questions and their corresponding answers:
+{
+  "descriptive": [
+    {
+      "question": "Sample descriptive question?",
+      "answer": "Sample answer providing a clear, concise explanation or process."
+    },
+    ...
+  ]
+}
+"""
 
 
 # for evaluating quiz using LLM
@@ -205,7 +329,7 @@ def get_model_response(prompt):
     messages = [
         {
   "role": "system",
-  "content": "You are a quiz generator. You must return only a valid JSON response containing exactly five multiple-choice questions (MCQs) and five descriptive questions with their answers. No additional text or explanations should be included in the response."
+  "content": system_quiz
 },
         {
             "role": "user",
@@ -248,11 +372,24 @@ def generate_quiz(topic):
 
     # print(mcq_response)
 
-    # print("ss")
-    # print(mcq_response)
-    # print("ss")
+    print("ss")
+    print(mcq_response)
+    print("ss")
     try:
+        start_index = mcq_response.find('{')
+        end_index = mcq_response.rfind('}')
+
+        if start_index != -1 and end_index != -1 and start_index < end_index:
+            mcq_response = mcq_response[start_index:end_index + 1]
+
+
         mcq_data = json.loads(mcq_response)
+        print("Succss")
+
+        # for question in mcq_response["mcq"]:
+        #   if question["correct"] not in {"0","1","2","3"}:
+        #     question["correct"] = "3"
+
         if "mcq" in mcq_data:
             quizArray["mcq"].extend(mcq_data["mcq"])
     except json.JSONDecodeError:
@@ -261,12 +398,21 @@ def generate_quiz(topic):
     # Generate Descriptive Questions
     descriptive_prompt = generate_formatted_prompt(topic=topic)[1]
     descriptive_response = get_model_response(descriptive_prompt)
-    # print("ehllo")
-    # print(descriptive_response)
-    # print("fff")
+    print("ehllo")
+    print(descriptive_response)
+    print("fff")
 
     try:
+        print("Htruing")
+
+        start_index = descriptive_response.find('{')
+        end_index = descriptive_response.rfind('}')
+
+        if start_index != -1 and end_index != -1 and start_index < end_index:
+            descriptive_response = descriptive_response[start_index:end_index + 1]
+
         descriptive_data = json.loads(descriptive_response)
+        print("hsucc")
         if "descriptive" in descriptive_data:
             quizArray["descriptive"].extend(descriptive_data["descriptive"])
     except json.JSONDecodeError:
@@ -361,7 +507,7 @@ def get_model_response_improvement(prompt):
     try:
         # Call the model with streaming enabled
         stream = client.chat.completions.create(
-        model="meta-llama/Llama-3.2-1B-Instruct",
+            model="meta-llama/Llama-3.2-1B-Instruct",
 	      messages= messages,
 	      max_tokens=3000,
         stop=["<END>"],

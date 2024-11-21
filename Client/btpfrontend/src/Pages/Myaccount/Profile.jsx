@@ -1,20 +1,16 @@
-import CircularProgress from "@mui/material/CircularProgress";
+import CircularProgress from '@mui/material/CircularProgress';
 import { message, Modal } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import IMG from "../../assets/profile.jpg";
 import DropdownComponent from './Dropdown';
+import FeedbackDisplay from "./FeedbackDisplay.jsx";
 const Profile = () => {
   const navigate = useNavigate();
   const data = useSelector((state) => state.user);
   const data1 = useSelector((state) => state.id);
-  const [adata, setAdata] = useState(
-    <div style={{ display: "flex",flexDirection:"column-reverse", alignItems: "center", justifyContent: "center", height: "100%" }}>
-      <CircularProgress />
-      <span style={{ marginLeft: "10px" }}>Let LLM Cook...</span>
-    </div>
-  );
+  const [adata, setAdata] = useState(null);
   console.log(data1);
 
   const isProfile = () => {
@@ -51,19 +47,19 @@ const Profile = () => {
               behavior: "smooth"
           });
           message.success(fetchedData.message);
-          console.log(fetchedData);
           setAdata(fetchedData.data);
       } else {
           message.error('Some error occurred');
+          setAdata("Currently we do not have any feedback");
       }
   } catch (error) {
-      console.log(error);
       message.error('Some error occurred');
+      setAdata("Currently we do not have any feedback");
   }
   }
   const showModal = async() => {
     setIsModalOpen(true);
-     await getassessment();
+    await getassessment();
   };
 
   const handleOk = () => {
@@ -88,7 +84,7 @@ const Profile = () => {
         borderRadius: '10px',
         height: '40px',
       }}>Assess Me</button>
-      <Modal title="Basic Modal" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={[
+      <Modal title="Feedback" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={[
     <button
       key="custom-cancel"
       onClick={handleCancel}
@@ -104,7 +100,19 @@ const Profile = () => {
       OK
     </button>,
   ]}>
-        <p style={{height:"400px" , overflowY:"scroll",padding:"10px"}}>{adata}</p>
+       <p style={{height:"400px" , overflowY:"scroll",padding:"10px"}}>
+        {
+          adata?
+          <FeedbackDisplay data={adata}/>
+          :
+          <div style={{ display: "flex",flexDirection:"column-reverse", alignItems: "center", justifyContent: "center", height: "100%" }}>
+          <CircularProgress />
+          <span style={{ marginLeft: "10px" }}>Let LLM Cook...</span>
+           </div>
+        }
+        
+        </p> 
+         
       </Modal>
     <div className="max-w-screen mx-auto my-8 flex gap-[5%]">
       {/* Left Box: Profile Details (60% width) */}

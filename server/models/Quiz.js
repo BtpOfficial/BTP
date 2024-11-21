@@ -23,7 +23,7 @@ const QuizSchema = new mongoose.Schema(
           },
           correct: {
             type: String,
-            enum: ['0', '1', '2', '3'],
+            // enum: ['0', '1', '2', '3'],
             required: true,
           }
         }
